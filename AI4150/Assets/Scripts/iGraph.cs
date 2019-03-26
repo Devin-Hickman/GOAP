@@ -1,16 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+public delegate INode FindNextNode(INode start, INode end);
 
-public interface iGraph
+public interface IGraph
 {
-    private List<iNode> graph;
-
-    public List<iNode> buildGraph();
-
-    private delegate iNode findNextNode(iNode start, iNode end);
+    List<INode> GetGraph();
+    List<INode> BuildGraph();
 
     // the public search is just a public wrapper on private search that throws the heuristic at the private search
-    public void search(iNode start, iNode end);
-    private void privateSearch(iNode start, iNode end, findNextNode heuristic);
+    void Search(INode start, INode end);
+    void Search(INode start, INode end, FindNextNode heuristic);
 }

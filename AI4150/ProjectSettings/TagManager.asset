@@ -44,3 +44,6 @@ TagManager:
   - name: NPC
     uniqueID: 538461057
     locked: 0
+  - name: Waypoint
+    uniqueID: 3009108709
+    locked: 0

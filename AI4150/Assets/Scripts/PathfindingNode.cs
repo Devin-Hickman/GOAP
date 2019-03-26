@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PathfindingNode : iNode
+public class PathFindingNode : AbstractNode
 {
     private double x
     {
@@ -15,14 +15,10 @@ public class PathfindingNode : iNode
         set;
     }
 
-    private PathfindingNode parentRegion;
+    private PathFindingNode parentRegion;
+    public PathFindingNode GetParentRegion() { return parentRegion; }
 
-    public List<PathfindingNode> getNeighbors()
-    {
-        return this.neighbors;
-    }
-
-    public override bool Equals(Object obj)
+    public bool Equals(PathFindingNode obj)
     {
         //Check for null and compare run-time types.
         if ((obj == null) || !this.GetType().Equals(obj.GetType()))
@@ -31,7 +27,7 @@ public class PathfindingNode : iNode
         }
         else
         {
-            PathfindingNode p = (PathfindingNode)obj;
+            PathFindingNode p = obj;
             return (x == p.x) && (y == p.y);
         }
     }

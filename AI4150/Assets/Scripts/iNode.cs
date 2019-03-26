@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface iNode
+public interface INode
 {
-    private List<iNode> neighbors;
+    List<INode> GetNeighbors();
 }
