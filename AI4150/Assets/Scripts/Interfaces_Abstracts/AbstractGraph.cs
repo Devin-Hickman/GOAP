@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class AbstractGraph : IGraph
+public abstract class AbstractGraph : MonoBehaviour, IGraph
 {
     public abstract List<INode> BuildGraph();
 

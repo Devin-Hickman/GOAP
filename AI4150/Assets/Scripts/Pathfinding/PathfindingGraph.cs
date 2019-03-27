@@ -1,18 +1,110 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-public class PathfindingGraph : AbstractGraph
+public class PathfindingGraph : MonoBehaviour, IGraph
 {
     private Queue<PathFindingNode> pathSoFar = new Queue<PathFindingNode>();
     List<PathFindingNode> topLevelPath = new List<PathFindingNode>();
     List<PathFindingNode> midLevelPath = new List<PathFindingNode>();
 
-    public override List<INode> BuildGraph()
+    //List of grids. Index corresponds to level in hierarchy with 0 being lowest
+    PathFindingNode[][,] hierarchicalGrids;
+
+    //These values are set in Unity's Inspector
+    public Transform gridStartPos;
+    public Transform gridEndPos;
+    public int gridCellSize; //Should be 1
+    public List<Tilemap> tileMapRegions;  //Expects tileMaps in order of hierarchy with 0 being the lowest
+    public Tilemap obstacleMap;
+
+    private void Awake()
+    {
+        hierarchicalGrids = new PathFindingNode[tileMapRegions.Count][,];
+    }
+
+    void Start()
+    {
+        BuildGraph();
+    }
+
+    private PathFindingNode[,] CreateLowLevelGrid()
+    {
+        int numCols = (int)Mathf.Abs((gridEndPos.position.x - gridStartPos.position.x) / gridCellSize);
+        int numRows = (int)Mathf.Abs((gridEndPos.position.y - gridStartPos.position.y) / gridCellSize);
+        return new PathFindingNode[numCols, numRows];
+    }
+
+    public List<INode> BuildGraph()
     {
         List<INode> res = new List<INode>();
-
+        BuildPathfindingNodes(0);
         return res;
+    }
+
+    private void BuildPathfindingNodes(int currentLevel)
+    {
+        int xIndex = -1;
+        int yIndex = -1;
+
+        hierarchicalGrids[currentLevel] = CreateLowLevelGrid();
+        Debug.Log("X:? " + hierarchicalGrids[currentLevel].GetLength(0));
+        Debug.Log("Y:? " + hierarchicalGrids[currentLevel].GetLength(1));
+
+        for (int x = (int)gridStartPos.position.x; x < gridEndPos.position.x; x += gridCellSize)
+        {
+            xIndex++;
+            Debug.Log(xIndex);
+            yIndex = -1;
+            for (int y = (int)gridStartPos.position.y; y < gridEndPos.position.y; y += gridCellSize)
+            {
+                PathFindingNode tmp = null;
+                TileBase tileBase = tileMapRegions[currentLevel].GetTile(new Vector3Int(x, y, 0));
+                if (tileBase != null) // Tile exists
+                {
+                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int(x, y, 0));
+                    bool walkable = (obstacleBase == null) ? true : false;
+                    tmp = new PathFindingNode(new Vector2(x, y), walkable);
+                }
+                yIndex++;
+                hierarchicalGrids[currentLevel][xIndex, yIndex] = tmp;
+            }
+        }
+        AssignNodeNeighbors();
+    }
+
+    private void AssignNodeNeighbors()
+    {
+        foreach(PathFindingNode[,] grid in hierarchicalGrids)
+        {
+            if(grid != null)
+            {
+                for (int x = 0; x < grid.GetLength(0); x++)
+                {
+                    for (int y = 0; y < grid.GetLength(1); y++)
+                    {
+                        if (grid[x, y] != null)
+                        {
+                            PathFindingNode curNode = grid[x, y];
+
+                            int xTmp = x - 1;
+                            if (xTmp > 0 && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) { curNode.AddNeighbor(grid[xTmp, y]); }
+
+                            xTmp = x + 1;
+                            if (xTmp < grid.GetLength(0) && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) { curNode.AddNeighbor(grid[xTmp, y]); }
+
+                            int yTmp = y - 1;
+                            if (yTmp > 0 && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) { curNode.AddNeighbor(grid[x, yTmp]); }
+
+                            yTmp = y + 1;
+                            if (yTmp < grid.GetLength(1) && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) { curNode.AddNeighbor(grid[x, yTmp]); }
+
+                        }
+                    }
+                }
+            }
+
+        }
     }
 
     // gets the neighbors of start and returns the one that is closest to end by euclidian distance
@@ -107,12 +199,17 @@ public class PathfindingGraph : AbstractGraph
         
     }
 
-    public override void Search(INode start, INode end)
+    public void Search(INode start, INode end)
     {
         throw new System.NotImplementedException();
     }
 
-    public override void Search(INode start, INode end, FindNextNode heuristic)
+    public void Search(INode start, INode end, FindNextNode heuristic)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public List<INode> GetGraph()
     {
         throw new System.NotImplementedException();
     }

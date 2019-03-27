@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class PathFindingNode : AbstractNode
 {
-    private double x
+    public Vector2 Pos { get; set; }
+    public float GetX { get { return Pos.x; } }
+    public float GetY { get { return Pos.y; } }
+    public bool IsWalkable { get; set; }
+    public List<INode> Neighbors { get { return neighbors; } set { neighbors = value; } }
+    public void AddNeighbor(PathFindingNode n) { neighbors.Add(n); }
+
+    public PathFindingNode(Vector2 pos_, bool walkable)
     {
-        get;
-        set;
-    }
-    private double y
-    {
-        get;
-        set;
+        Pos = pos_;
+        IsWalkable = walkable;
+        neighbors = new List<INode>();
+        
     }
 
     private PathFindingNode parentRegion;
@@ -28,7 +32,7 @@ public class PathFindingNode : AbstractNode
         else
         {
             PathFindingNode p = obj;
-            return (x == p.x) && (y == p.y);
+            return (GetX == p.GetX) && (GetY == p.GetY);
         }
     }
 }
