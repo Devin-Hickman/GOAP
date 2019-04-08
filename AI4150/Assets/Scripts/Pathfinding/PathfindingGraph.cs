@@ -48,8 +48,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         int yIndex = -1;
 
         hierarchicalGrids[currentLevel] = CreateLowLevelGrid();
-        Debug.Log("X:? " + hierarchicalGrids[currentLevel].GetLength(0));
-        Debug.Log("Y:? " + hierarchicalGrids[currentLevel].GetLength(1));
+        int nodesMade = 0;
 
         for (int x = (int)gridStartPos.position.x; x < gridEndPos.position.x; x += gridCellSize)
         {
@@ -62,15 +61,24 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                 TileBase tileBase = tileMapRegions[currentLevel].GetTile(new Vector3Int(x, y, 0));
                 if (tileBase != null) // Tile exists
                 {
+                    nodesMade++;
                     TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int(x, y, 0));
                     bool walkable = (obstacleBase == null) ? true : false;
                     tmp = new PathFindingNode(new Vector2(x, y), walkable);
+                    CreateDebugNode(x, y, walkable, "L" + currentLevel + " N" +nodesMade);
                 }
                 yIndex++;
                 hierarchicalGrids[currentLevel][xIndex, yIndex] = tmp;
             }
         }
         AssignNodeNeighbors();
+    }
+
+    private void CreateDebugNode(int x, int y, bool walkable, string name)
+    {
+        GameObject g = new GameObject();
+        g.AddComponent<NodeGizmos>();
+        g.GetComponent<NodeGizmos>().SetValues(x, y, walkable, name);
     }
 
     private void AssignNodeNeighbors()
