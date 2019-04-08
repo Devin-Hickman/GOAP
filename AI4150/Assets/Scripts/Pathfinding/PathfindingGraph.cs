@@ -67,6 +67,16 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                     tmp = new PathFindingNode(new Vector2(x, y), walkable);
                     CreateDebugNode(x, y, walkable, "L" + currentLevel + " N" +nodesMade);
                 }
+                else
+                {
+                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int(x, y, 0));
+                    if(obstacleBase != null)
+                    {
+                        nodesMade++;
+                        tmp = new PathFindingNode(new Vector2(x, y), false);
+                        CreateDebugNode(x, y, false, "L" + currentLevel + " N" + nodesMade);
+                    }
+                }
                 yIndex++;
                 hierarchicalGrids[currentLevel][xIndex, yIndex] = tmp;
             }
