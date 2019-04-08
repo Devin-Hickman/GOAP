@@ -12,10 +12,6 @@ public class AbstractGOAPGraph : AbstractGraph
     public override void Search(INode start, INode end)
     {
         AbstractActionNode endAction = (AbstractActionNode)end;
-        foreach(AbstractCondition a in endAction.GetPreConditionsToFulFill())
-        {
-            //Find actions that can fulfill the required preconditions
-        }
 
         throw new System.NotImplementedException();
     }

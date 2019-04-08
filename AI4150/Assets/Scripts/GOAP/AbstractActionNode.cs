@@ -1,36 +1,45 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class AbstractActionNode : AbstractNode
+public abstract class AbstractActionNode : MonoBehaviour
 {
-    protected List<AbstractCondition> preConditions;
-    protected List<AbstractCondition> postConditions;
+    protected Dictionary<Condition, object> preConditions;
+    protected Dictionary<Condition, object> currentConditions;
+    protected Dictionary<Condition, object> postConditions;
 
-    public List<AbstractCondition> GetPreConditionsToFulFill()
+    public List<KeyValuePair<Condition, object>> GetPreConditionsToFulFill()
     {
-        List<AbstractCondition> res = new List<AbstractCondition>();
-        foreach(AbstractCondition a in preConditions)
+        List<KeyValuePair<Condition, object>> res = new List<KeyValuePair<Condition, object>>();
+        foreach (KeyValuePair<Condition, object> kvp in preConditions)
         {
-            if(!a.IsCompleted()) { res.Add(a); }
+            if (kvp.Value != currentConditions[kvp.Key])
+            {
+                res.Add(kvp);
+            }
         }
         return res;
     }
 
     public bool CheckPreConditions()
     {
-        foreach (AbstractCondition a in preConditions)
-        {
-            if (!a.IsCompleted()) { return false;}
-        }
-        return true;
+        List<KeyValuePair<Condition, object>> tmp = GetPreConditionsToFulFill();
+        return tmp.Count == 0;
     }
-    
+
     public void FulFillPostConditions()
     {
-        foreach(AbstractCondition a in postConditions)
+        foreach(KeyValuePair<Condition, object> kvp in postConditions)
         {
-            a.Complete();
+            if (currentConditions.ContainsKey(kvp.Key))
+            {
+                currentConditions[kvp.Key] = kvp.Value;
+            }
+            else
+            {
+                currentConditions.Add(kvp.Key, kvp.Value);
+            }
         }
     }
 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class AbstractCondition 
 {
     private bool completion = false;
+
     public bool IsCompleted()
     {
         return completion;
