@@ -2,10 +2,13 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System;
+using System.Linq;
 
 public class PathfindingGraph : MonoBehaviour, IGraph
 {
     private Queue<PathFindingNode> pathSoFar = new Queue<PathFindingNode>();
+    private Dictionary<string, PathFindingNode> bottomLevelDict = new Dictionary<string, PathFindingNode>();
+
     List<PathFindingNode> topLevelPath = new List<PathFindingNode>();
     List<PathFindingNode> midLevelPath = new List<PathFindingNode>();
 
@@ -47,12 +50,10 @@ public class PathfindingGraph : MonoBehaviour, IGraph
      */ 
     public PathFindingNode GetNearestNode(float x, float y)
     {
-        int xInt = (int)Mathf.RoundToInt(x);
-        int yInt = (int)Mathf.RoundToInt(y);
-
+        string key = string.Format("{0:N0}", Mathf.Round(x)) + "," + string.Format("{0:N0}", Mathf.Round(y));
         try
         {
-            return this.hierarchicalGrids[0][xInt, yInt];
+            return this.bottomLevelDict[key];
         } catch
         {
             return null;
@@ -70,6 +71,12 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         // to build next level of nodes do clustering on the first level of nodes based off of their distance from an estimated center
         // instantiate clusters estimates with 5 times less nodes than the previous level
         // do the same thing again on that layer to generate the top level.
+        //int layer = 1;
+        //while(hierarchicalGrids[layer - 1].Length * hierarchicalGrids[layer - 1].Length > 100)
+        //{
+
+        //}
+        //BuildPathfindingNodes(1);
         return res;
     }
 
@@ -111,6 +118,10 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                     }
                 }
                 yIndex++;
+                if(tmp != null)
+                {
+                    bottomLevelDict.Add(tmp.GetName, tmp);
+                }
                 hierarchicalGrids[currentLevel][xIndex, yIndex] = tmp;
             }
         }
@@ -187,37 +198,37 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     }
 
 
-    List<PathFindingNode> UpdateBottomLevelPath(PathFindingNode start, PathFindingNode end)
-    {
-        List<PathFindingNode> bottomLevelPath = AStar(start, end);
-        pathVisaulDebugger.DrawLines(bottomLevelPath);
+    //List<PathFindingNode> UpdateBottomLevelPath(PathFindingNode start, PathFindingNode end)
+    //{
+    //    List<PathFindingNode> bottomLevelPath = AStar(start, end);
+    //    pathVisaulDebugger.DrawLines(bottomLevelPath);
 
-        for (int i = 0; i < bottomLevelPath.Count; i++)
-        {
-            pathSoFar.Enqueue(bottomLevelPath[i]);
-        }
-        return bottomLevelPath;
-    }
+    //    for (int i = 0; i < bottomLevelPath.Count; i++)
+    //    {
+    //        pathSoFar.Enqueue(bottomLevelPath[i]);
+    //    }
+    //    return bottomLevelPath;
+    //}
 
-    List<PathFindingNode> updateMidLevelPath(PathFindingNode start, PathFindingNode firstMidLevel, PathFindingNode end) {
-        List<PathFindingNode> result = new List<PathFindingNode>();
-        midLevelPath = AStar(firstMidLevel, end);
-        List<PathFindingNode> bottomLevelPath = new List<PathFindingNode>();
-        PathFindingNode bottomStart = start;
-        for (int i = 1; i < midLevelPath.Count; i++)
-        {
-            if (bottomLevelPath.Count > 0)
-            {
-                bottomStart = bottomLevelPath[bottomLevelPath.Count - 1];
-            }
-            bottomLevelPath = UpdateBottomLevelPath(bottomStart, midLevelPath[i]);
-        }
-        return result;
-    }
+    //List<PathFindingNode> updateMidLevelPath(PathFindingNode start, PathFindingNode firstMidLevel, PathFindingNode end) {
+    //    List<PathFindingNode> result = new List<PathFindingNode>();
+    //    midLevelPath = AStar(firstMidLevel, end);
+    //    List<PathFindingNode> bottomLevelPath = new List<PathFindingNode>();
+    //    PathFindingNode bottomStart = start;
+    //    for (int i = 1; i < midLevelPath.Count; i++)
+    //    {
+    //        if (bottomLevelPath.Count > 0)
+    //        {
+    //            bottomStart = bottomLevelPath[bottomLevelPath.Count - 1];
+    //        }
+    //        bottomLevelPath = UpdateBottomLevelPath(bottomStart, midLevelPath[i]);
+    //    }
+    //    return result;
+    //}
 
     // do A star 
     // kick out if the parent changes or if you reach end
-    private List<PathFindingNode> AStar(PathFindingNode start, PathFindingNode end)
+    private PathFindingNode AStar(PathFindingNode start, PathFindingNode end)
     {
         List<PathFindingNode> path = new List<PathFindingNode>();
         // do A* from start to end but kick out the path if you enter a new region or sub region
@@ -241,21 +252,25 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                 {
                     // TODO add hierarchy check to see if we have changed hierarchies. If we have then we should also kick out and return
                     // we made it to the end
+                    neighbor.Parent = parent;
                     neighbor.CostSoFar = costSoFar;
                     path.Add(neighbor);
-                    return path;
+                    return neighbor;
                 }
                 if(lookUpTable.ContainsKey(neighbor.GetName) && lookUpTable[neighbor.GetName].CostSoFar < costSoFar)
                 {
                     continue;
+                } else if(!lookUpTable.ContainsKey(neighbor.GetName))
+                {
+                    neighbor.Parent = parent;
+                    neighbor.CostSoFar = costSoFar;
+                    lookUpTable.Add(neighbor.GetName, neighbor);
+                    priorityQueue.Enqueue(neighbor);
                 }
-                neighbor.CostSoFar = costSoFar;
-                lookUpTable.Add(neighbor.GetName, neighbor);
-                priorityQueue.Enqueue(neighbor);
             }
         }
 
-        return path;
+        return null;
         
     }
 
@@ -266,7 +281,14 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     */
     public void Search(INode start, INode end)
     {
-        AStar((PathFindingNode)start, (PathFindingNode)end);
+        PathFindingNode result = AStar((PathFindingNode)start, (PathFindingNode)end);
+        while(result.Parent != null)
+        {
+            pathSoFar.Enqueue(result);
+            result = (PathFindingNode)result.Parent;
+        }
+        pathVisaulDebugger.DrawLines(pathSoFar.ToList());
+        return;
     }
 
     //public void Search(INode start, INode end, FindNextNode heuristic)

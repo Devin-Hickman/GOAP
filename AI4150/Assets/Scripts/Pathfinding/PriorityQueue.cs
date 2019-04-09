@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+/**
+ * This code was taken from here as priority queues aren't the focus of our implementation: https://visualstudiomagazine.com/Articles/2012/11/01/Priority-Queues-with-C.aspx
+ * A few changes were made to suit our usecase.
+ */
 public class PriorityQueue
 {
     private List<AbstractNode> data;
