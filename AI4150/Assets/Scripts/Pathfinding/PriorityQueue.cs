@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class PriorityQueue<AbstractNode>
+public class PriorityQueue
 {
     private List<AbstractNode> data;
     private AbstractNode goal;
@@ -11,7 +11,7 @@ public class PriorityQueue<AbstractNode>
     public PriorityQueue(AbstractNode goal)
     {
         this.data = new List<AbstractNode>();
-        this.goal = goal;
+        this.goal = goal;     
     }
 
     public void Enqueue(AbstractNode item)
