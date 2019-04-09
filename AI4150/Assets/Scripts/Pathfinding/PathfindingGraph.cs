@@ -53,7 +53,6 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         for (int x = (int)gridStartPos.position.x; x < gridEndPos.position.x; x += gridCellSize)
         {
             xIndex++;
-            Debug.Log(xIndex);
             yIndex = -1;
             for (int y = (int)gridStartPos.position.y; y < gridEndPos.position.y; y += gridCellSize)
             {

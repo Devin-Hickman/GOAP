@@ -5,15 +5,21 @@ using UnityEngine;
 
 public abstract class GOAPAction : MonoBehaviour
 {
-    protected Dictionary<Condition, object> preConditions;
-    protected Dictionary<Condition, object> postConditions;
-    public Dictionary<Condition, object> PostConditions { get { return postConditions; } }
+    protected Dictionary<Condition, bool> preConditions = new Dictionary<Condition, bool>();
+    protected Dictionary<Condition, bool> postConditions = new Dictionary<Condition, bool>();
+    public Dictionary<Condition, bool> PostConditions { get { return postConditions; } }
     public float Cost { get; set; }
 
-    public Dictionary<Condition, object> GetPreConditionsToFulFill(Dictionary<Condition, object> currentState)
+    protected void Awake()
     {
-        Dictionary<Condition, object> res = new Dictionary<Condition, object>();
-        foreach (KeyValuePair<Condition, object> kvp in preConditions)
+        preConditions = new Dictionary<Condition, bool>();
+        postConditions = new Dictionary<Condition, bool>();
+    }
+
+    public Dictionary<Condition, bool> GetPreConditionsToFulFill(Dictionary<Condition, bool> currentState)
+    {
+        Dictionary<Condition, bool> res = new Dictionary<Condition, bool>();
+        foreach (KeyValuePair<Condition, bool> kvp in preConditions)
         {
             if(!currentState.ContainsKey(kvp.Key) || currentState[kvp.Key] != kvp.Value)
             {
@@ -23,7 +29,7 @@ public abstract class GOAPAction : MonoBehaviour
         return res;
     }
 
-    public bool CheckPreConditions(Dictionary<Condition, object> currentState)
+    public bool CheckPreConditions(Dictionary<Condition, bool> currentState)
     {
         return GetPreConditionsToFulFill(currentState).Count == 0;
     }
@@ -32,10 +38,10 @@ public abstract class GOAPAction : MonoBehaviour
     /// Takes in a state and applies the actions post conditions to it
     /// </summary>
     /// <param name="newState">Updated world state</param>
-    public Dictionary<Condition, object> ApplyPostConditionsToState(Dictionary<Condition, object> curState)
+    public Dictionary<Condition, bool> ApplyPostConditionsToState(Dictionary<Condition, bool> curState)
     {
-        Dictionary<Condition, object> newState = new Dictionary<Condition, object>(curState);
-        foreach(KeyValuePair<Condition,object> kvp in postConditions)
+        Dictionary<Condition, bool> newState = new Dictionary<Condition, bool>(curState);
+        foreach(KeyValuePair<Condition, bool> kvp in postConditions)
         {
             if (newState.ContainsKey(kvp.Key))
             {

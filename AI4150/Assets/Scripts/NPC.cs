@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class NPC : MonoBehaviour
 {
-    private Dictionary<Condition, object> npcState = new Dictionary<Condition, object>();
-    public HashSet<GOAPAction> AllActions { get; }
+    private Dictionary<Condition, bool> npcState = new Dictionary<Condition, bool>();
+    public HashSet<GOAPAction> AllActions { get; } = new HashSet<GOAPAction>();
     private HashSet<GOAPAction> currentUsableActions = new HashSet<GOAPAction>();
+    GOAPPlanner planner = new GOAPPlanner();
     // Start is called before the first frame update
     void Awake()
     {
@@ -30,8 +31,27 @@ public class NPC : MonoBehaviour
         }
     }
 
-    public Dictionary<Condition, object> GetNPCState()
+    public Dictionary<Condition, bool> GetNPCState()
     {
         return npcState;
+    }
+
+    public void INeedSword()
+    {
+        Debug.Log("I need a sword!");
+        Dictionary<Condition, bool> gd = new Dictionary<Condition, bool>();
+        gd.Add(Condition.hasSword, true);
+        Queue<GOAPAction> plan = planner.CreatePlan(this, gd);
+        StartCoroutine(DoPlan(plan));
+    }
+
+    private IEnumerator DoPlan(Queue<GOAPAction> plan)
+    {
+        Debug.Log("Time to do this thing!");
+        while(plan.Count > 0)
+        {
+            plan.Dequeue().DoAction();
+            yield return null;
+        }
     }
 }
