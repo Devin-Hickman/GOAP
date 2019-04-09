@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 966688954}
   - component: {fileID: 966688953}
   m_Layer: 0
-  m_Name: PathfindingGraph
+  m_Name: PathGraph
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

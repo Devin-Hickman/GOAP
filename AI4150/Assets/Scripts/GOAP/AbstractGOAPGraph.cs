@@ -20,8 +20,5 @@ public class AbstractGOAPGraph : AbstractGraph
         throw new System.NotImplementedException();
     }
 
-    public override void Search(INode start, INode end, FindNextNode heuristic)
-    {
-        throw new System.NotImplementedException();
-    }
+
 }

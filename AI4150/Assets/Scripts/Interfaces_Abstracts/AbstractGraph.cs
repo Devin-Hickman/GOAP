@@ -13,5 +13,5 @@ public abstract class AbstractGraph : MonoBehaviour, IGraph
 
     public abstract void Search(INode start, INode end);
 
-    public abstract void Search(INode start, INode end, FindNextNode heuristic);
+    //public abstract void Search(INode start, INode end, FindNextNode heuristic);
 }
