@@ -7,10 +7,10 @@ public class GOAPPlanner
     int MAX_DEPTH = 5;
     HashSet<GOAPAction> usedActions = new HashSet<GOAPAction>();
 
-    public Queue<GOAPAction> CreatePlan(NPC agent, Dictionary<Condition, bool> goal)
+    public Queue<GOAPAction> CreatePlan(NPC agent, Dictionary<Condition, object> goal)
     {
         Debug.Log("Planning....");
-        Dictionary<Condition, bool> currentNPCState = agent.GetNPCState();
+        Dictionary<Condition, object> currentNPCState = agent.GetNPCState();
         //Check to see if goal is already fulfilled
         if (GoalFromState(goal, currentNPCState))
         {
@@ -59,7 +59,7 @@ public class GOAPPlanner
         return plan;
     }
 
-    private HashSet<GOAPAction> GetUsableActions(HashSet<GOAPAction> actions, Dictionary<Condition, bool> currentState)
+    private HashSet<GOAPAction> GetUsableActions(HashSet<GOAPAction> actions, Dictionary<Condition, object> currentState)
     {
         HashSet<GOAPAction> usableActions = new HashSet<GOAPAction>();
         //Gets actions whose postConditions meet our goal
@@ -74,7 +74,7 @@ public class GOAPPlanner
     }
 
     //Currently using DFS, goal to switch to A*
-    private void BuildGraph(GOAPNode root, HashSet<GOAPAction> usableActions, Dictionary<Condition, bool> goal, int searchDepth, List<GOAPNode> solutionNodes)
+    private void BuildGraph(GOAPNode root, HashSet<GOAPAction> usableActions, Dictionary<Condition, object> goal, int searchDepth, List<GOAPNode> solutionNodes)
     {
         if(searchDepth > MAX_DEPTH)
         {
@@ -87,7 +87,7 @@ public class GOAPPlanner
 
             if (action.CheckPreConditions(root.state))
             {
-                Dictionary<Condition, bool> newState = action.ApplyPostConditionsToState(root.state);
+                Dictionary<Condition, object> newState = action.ApplyPostConditionsToState(root.state);
                 GOAPNode node = new GOAPNode(root, action, newState, root.costSoFar + action.Cost);
                 
                 if (GoalFromState(goal, newState))
@@ -104,12 +104,12 @@ public class GOAPPlanner
         }
     }
 
-    private bool GoalFromState(Dictionary<Condition, bool> goal, Dictionary<Condition, bool> state)
+    private bool GoalFromState(Dictionary<Condition, object> goal, Dictionary<Condition, object> state)
     {
         //Iterate through all goal states in goals. If the currentWorld state can fulfill all goals then return true, else return false
-        foreach (KeyValuePair<Condition, bool> kvp in goal)
+        foreach (KeyValuePair<Condition, object> kvp in goal)
         {
-            if (state.ContainsKey(kvp.Key) && state[kvp.Key] == kvp.Value) { continue; }
+            if (state.ContainsKey(kvp.Key) && state[kvp.Key].Equals(kvp.Value)) { continue; }
             else
             {
                 bool t = state.ContainsKey(kvp.Key);
@@ -125,10 +125,10 @@ public class GOAPPlanner
         return true;
     }
 
-    private bool GoalFromAction(Dictionary<Condition, bool> goals, GOAPAction action)
+    private bool GoalFromAction(Dictionary<Condition, object> goals, GOAPAction action)
         {
             //Iterate through all goal states in goals. If the action can fulfill all goals then return true, else return false
-            foreach (KeyValuePair<Condition, bool> kvp in goals)
+            foreach (KeyValuePair<Condition, object> kvp in goals)
             {
                 if (!action.PostConditions.ContainsKey(kvp.Key) && action.PostConditions[kvp.Key] != kvp.Value)
                 {

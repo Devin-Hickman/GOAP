@@ -9,5 +9,6 @@ public enum Condition
     hasRangedWeapon,
     hasTool,
     damageTarget,
+    hasIron
 }
 

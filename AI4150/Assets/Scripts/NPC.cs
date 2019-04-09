@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class NPC : MonoBehaviour
 {
-    private Dictionary<Condition, bool> npcState = new Dictionary<Condition, bool>();
+    private Dictionary<Condition, object> npcState = new Dictionary<Condition, object>();
     public HashSet<GOAPAction> AllActions { get; } = new HashSet<GOAPAction>();
     private HashSet<GOAPAction> currentUsableActions = new HashSet<GOAPAction>();
     GOAPPlanner planner = new GOAPPlanner();
@@ -31,7 +31,7 @@ public class NPC : MonoBehaviour
         }
     }
 
-    public Dictionary<Condition, bool> GetNPCState()
+    public Dictionary<Condition, object> GetNPCState()
     {
         return npcState;
     }
@@ -39,10 +39,13 @@ public class NPC : MonoBehaviour
     public void INeedSword()
     {
         Debug.Log("I need a sword!");
-        Dictionary<Condition, bool> gd = new Dictionary<Condition, bool>();
+        Dictionary<Condition, object> gd = new Dictionary<Condition, object>();
         gd.Add(Condition.hasSword, true);
         Queue<GOAPAction> plan = planner.CreatePlan(this, gd);
-        StartCoroutine(DoPlan(plan));
+        if(plan != null)
+        {
+            StartCoroutine(DoPlan(plan));
+        }
     }
 
     private IEnumerator DoPlan(Queue<GOAPAction> plan)

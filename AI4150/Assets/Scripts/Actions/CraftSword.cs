@@ -8,6 +8,7 @@ public class CraftSword : GOAPAction
     private new void Awake()
     {
         base.Awake();
+        //preConditions.Add(Condition.hasIron, true);
         postConditions.Add(Condition.hasSword, true);
     }
 
