@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System;
 
 public class PathfindingGraph : MonoBehaviour, IGraph
 {
@@ -28,6 +29,10 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         BuildGraph();
     }
 
+    /**
+     * Builds the first level of the graph using the tiles and nodes passed to it
+     * 
+     */
     private PathFindingNode[,] CreateLowLevelGrid()
     {
         int numCols = (int)Mathf.Abs((gridEndPos.position.x - gridStartPos.position.x) / gridCellSize);
@@ -35,6 +40,10 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         return new PathFindingNode[numCols, numRows];
     }
 
+    /**
+     * Builds the varying layers of the graph and updates the heirarchicalGrids object accordingly
+     * 
+     */
     public List<INode> BuildGraph()
     {
         List<INode> res = new List<INode>();
@@ -42,6 +51,9 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         return res;
     }
 
+    /**
+     * Builds the lowest level of the graph using the tiles and updates the hierarchicalGrids object with that lowest level
+     */
     private void BuildPathfindingNodes(int currentLevel)
     {
         int xIndex = -1;
@@ -83,6 +95,10 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         AssignNodeNeighbors();
     }
 
+    /**
+    * Creates the nodes that are visible to the developer
+    * 
+    */
     private void CreateDebugNode(int x, int y, bool walkable, string name)
     {
         GameObject g = new GameObject();
@@ -90,6 +106,10 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         g.GetComponent<NodeGizmos>().SetValues(x, y, walkable, name);
     }
 
+    /**
+    * Adds the neighboring nodes as neighbors to each node if they are walkable.
+    * 
+    */
     private void AssignNodeNeighbors()
     {
         foreach(PathFindingNode[,] grid in hierarchicalGrids)
@@ -125,63 +145,29 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     }
 
     // gets the neighbors of start and returns the one that is closest to end by euclidian distance
-    private PathFindingNode returnNodeWithShortestDistToTarget(PathFindingNode start, PathFindingNode end)
+    private PathFindingNode ReturnNodeWithShortestDistToTarget(PathFindingNode start, PathFindingNode end)
     {
-        PathFindingNode res = null;
-
-        return res;
-    }
-
-    //public void search(PathfindingNode start, PathfindingNode end)
-    //{
-    //    findNextNode heuristic = returnNodeWithShortestDistToTarget;
-    //    privateSearch(start, end, heuristic);
-
-    //}
-
-    /**
-    * Search
-    * The nodes it is passed must be bottom level nodes if they are regional or parent nodes then this won't work... 
-    * These bottom level nodes most
-    * 
-    */
-    // this assumes there is always a path to a given location
-    public void search(PathFindingNode start, PathFindingNode end)
-    {
-        if(start.GetParentRegion().GetParentRegion() == null || end.GetParentRegion().GetParentRegion() == null)
+        double shortestDistance = double.MaxValue;
+        PathFindingNode closest = null;
+        foreach (PathFindingNode neighbor in start.GetNeighbors())
         {
-            //Is this true? What about searching on the top-most level?
-            throw new System.Exception("start and end nodes must both have two layers of parents above them.");
-        }
-
-        if(!start.GetParentRegion().GetParentRegion().Equals(end.GetParentRegion().GetParentRegion()))
-        {
-            // generate the toplevel path then 
-            topLevelPath = aStar(start.GetParentRegion().GetParentRegion(), end.GetParentRegion().GetParentRegion());
-            for (int i = 1; i < topLevelPath.Count; i++)
+            if(neighbor != null)
             {
-                // initi
-                PathFindingNode midLevelStart = start.GetParentRegion();
-                if (midLevelPath.Count > 0)
+                double temp = Math.Sqrt(Math.Pow(neighbor.GetX - end.GetX, 2) + Math.Pow(neighbor.GetY - end.GetY, 2));
+                if (temp < shortestDistance)
                 {
-                    midLevelStart = midLevelPath[midLevelPath.Count - 1];
+                    shortestDistance = temp;
                 }
-                updateMidLevelPath(start, midLevelStart, topLevelPath[i]);
             }
-        } else if (!start.GetParentRegion().Equals(end.GetParentRegion()))
-        {
-            // do the mid level Path
-            updateMidLevelPath(start, start.GetParentRegion(), end.GetParentRegion());
-        } else
-        {
-            // do straight A* between the nodes and return that path.
-            updateBottomLevelPath(start, end);
         }
+
+        return closest;
     }
 
-    List<PathFindingNode> updateBottomLevelPath(PathFindingNode start, PathFindingNode end)
+
+    List<PathFindingNode> UpdateBottomLevelPath(PathFindingNode start, PathFindingNode end)
     {
-        List<PathFindingNode> bottomLevelPath = aStar(start, end);
+        List<PathFindingNode> bottomLevelPath = AStar(start, end);
         for (int i = 0; i < bottomLevelPath.Count; i++)
         {
             pathSoFar.Enqueue(bottomLevelPath[i]);
@@ -191,7 +177,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
 
     List<PathFindingNode> updateMidLevelPath(PathFindingNode start, PathFindingNode firstMidLevel, PathFindingNode end) {
         List<PathFindingNode> result = new List<PathFindingNode>();
-        midLevelPath = aStar(firstMidLevel, end);
+        midLevelPath = AStar(firstMidLevel, end);
         List<PathFindingNode> bottomLevelPath = new List<PathFindingNode>();
         PathFindingNode bottomStart = start;
         for (int i = 1; i < midLevelPath.Count; i++)
@@ -200,31 +186,38 @@ public class PathfindingGraph : MonoBehaviour, IGraph
             {
                 bottomStart = bottomLevelPath[bottomLevelPath.Count - 1];
             }
-            bottomLevelPath = updateBottomLevelPath(bottomStart, midLevelPath[i]);
+            bottomLevelPath = UpdateBottomLevelPath(bottomStart, midLevelPath[i]);
         }
         return result;
     }
 
     // do A star 
     // kick out if the parent changes or if you reach end
-    private List<PathFindingNode> aStar(PathFindingNode start, PathFindingNode end)
+    private List<PathFindingNode> AStar(PathFindingNode start, PathFindingNode end)
     {
         List<PathFindingNode> path = new List<PathFindingNode>();
         // do A* from start to end but kick out the path if you enter a new region or sub region
+        PriorityQueue<PathFindingNode> priorityQueue = new PriorityQueue<PathFindingNode>();
+        
 
         return path;
         
     }
 
+    /**
+    * Search
+    * This is a generic search function for the algorithm
+    * The start and end nodes must be in the same hierarchy and this will find it's way
+    */
     public void Search(INode start, INode end)
     {
-        throw new System.NotImplementedException();
+        
     }
 
-    public void Search(INode start, INode end, FindNextNode heuristic)
-    {
-        throw new System.NotImplementedException();
-    }
+    //public void Search(INode start, INode end, FindNextNode heuristic)
+    //{
+    //    throw new System.NotImplementedException();
+    //}
 
     public List<INode> GetGraph()
     {
