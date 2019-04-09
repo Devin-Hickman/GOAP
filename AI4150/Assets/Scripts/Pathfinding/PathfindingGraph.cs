@@ -41,6 +41,23 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     }
 
     /**
+     * passed in an x and y float and that is coerced to a position on the graph
+     */ 
+    public PathFindingNode GetNearestNode(float x, float y)
+    {
+        int xInt = (int)Mathf.RoundToInt(x);
+        int yInt = (int)Mathf.RoundToInt(y);
+
+        try
+        {
+            return this.hierarchicalGrids[0][xInt, yInt];
+        } catch
+        {
+            return null;
+        }
+    }
+
+    /**
      * Builds the varying layers of the graph and updates the heirarchicalGrids object accordingly
      * 
      */
@@ -48,6 +65,9 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     {
         List<INode> res = new List<INode>();
         BuildPathfindingNodes(0);
+        // to build next level of nodes do clustering on the first level of nodes based off of their distance from an estimated center
+        // instantiate clusters estimates with 5 times less nodes than the previous level
+        // do the same thing again on that layer to generate the top level.
         return res;
     }
 
@@ -197,8 +217,39 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     {
         List<PathFindingNode> path = new List<PathFindingNode>();
         // do A* from start to end but kick out the path if you enter a new region or sub region
-        PriorityQueue<PathFindingNode> priorityQueue = new PriorityQueue<PathFindingNode>();
-        
+        start.CostSoFar = 0;
+        PriorityQueue priorityQueue = new PriorityQueue(start);
+        Dictionary<string, PathFindingNode> lookUpTable = new Dictionary<string, PathFindingNode>
+        {
+            { start.GetName, start }
+        };
+        priorityQueue.Enqueue(start);
+
+        while(priorityQueue.Count() > 0)
+        {
+            PathFindingNode parent = (PathFindingNode)priorityQueue.Peek();
+            priorityQueue.Dequeue();
+            foreach(PathFindingNode neighbor in parent.GetNeighbors())
+            {
+                float costFromParent = (float)Math.Sqrt(Math.Pow(neighbor.GetX - parent.GetX, 2) + Math.Pow(neighbor.GetY - parent.GetY, 2));
+                float costSoFar = parent.CostSoFar + costFromParent;
+                if(neighbor.GetName == end.GetName)
+                {
+                    // TODO add hierarchy check to see if we have changed hierarchies. If we have then we should also kick out and return
+                    // we made it to the end
+                    neighbor.CostSoFar = costSoFar;
+                    path.Add(neighbor);
+                    return path;
+                }
+                if(lookUpTable.ContainsKey(neighbor.GetName) && lookUpTable[neighbor.GetName].CostSoFar < costSoFar)
+                {
+                    continue;
+                }
+                neighbor.CostSoFar = costSoFar;
+                lookUpTable.Add(neighbor.GetName, neighbor);
+                priorityQueue.Enqueue(neighbor);
+            }
+        }
 
         return path;
         
@@ -211,7 +262,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     */
     public void Search(INode start, INode end)
     {
-        
+        AStar((PathFindingNode)start, (PathFindingNode)end);
     }
 
     //public void Search(INode start, INode end, FindNextNode heuristic)
