@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class PriorityQueue<PathFindingNode>
+public class PriorityQueue<AbstractNode>
 {
-    private List<PathFindingNode> data;
-    private PathFindingNode goal;
+    private List<AbstractNode> data;
+    private AbstractNode goal;
 
-    public PriorityQueue(PathFindingNode goal)
+    public PriorityQueue(AbstractNode goal)
     {
-        this.data = new List<PathFindingNode>();
+        this.data = new List<AbstractNode>();
         this.goal = goal;
     }
 
-    public void Enqueue(PathFindingNode item)
+    public void Enqueue(AbstractNode item)
     {
         data.Add(item);
         int ci = data.Count - 1; // child index; start at end
@@ -26,16 +26,16 @@ public class PriorityQueue<PathFindingNode>
                 break; // child item is larger than (or equal) parent so we're done
             }
 
-            PathFindingNode tmp = data[ci]; data[ci] = data[pi]; data[pi] = tmp;
+            AbstractNode tmp = data[ci]; data[ci] = data[pi]; data[pi] = tmp;
             ci = pi;
         }
     }
 
-    public PathFindingNode Dequeue()
+    public AbstractNode Dequeue()
     {
         // assumes pq is not empty; up to calling code
         int li = data.Count - 1; // last index (before removal)
-        PathFindingNode frontItem = data[0];   // fetch the front
+        AbstractNode frontItem = data[0];   // fetch the front
         data[0] = data[li];
         data.RemoveAt(li);
 
@@ -49,15 +49,15 @@ public class PriorityQueue<PathFindingNode>
             if (rc <= li && data[rc].Heuristic(data[ci], this.goal) < 0) // if there is a rc (ci + 1), and it is smaller than left child, use the rc instead
                 ci = rc;
             if (data[pi].Heuristic(data[ci], this.goal) <= 0) break; // parent is smaller than (or equal to) smallest child so done
-            PathFindingNode tmp = data[pi]; data[pi] = data[ci]; data[ci] = tmp; // swap parent and child
+            AbstractNode tmp = data[pi]; data[pi] = data[ci]; data[ci] = tmp; // swap parent and child
             pi = ci;
         }
         return frontItem;
     }
 
-    public PathFindingNode Peek()
+    public AbstractNode Peek()
     {
-        PathFindingNode frontItem = data[0];
+        AbstractNode frontItem = data[0];
         return frontItem;
     }
 
