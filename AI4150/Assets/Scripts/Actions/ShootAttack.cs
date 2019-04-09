@@ -10,11 +10,6 @@ public class ShootAttack : AbstractAttackAction , IWeaponAttack
         preConditions.Add(Condition.hasRangedWeapon, true);
     }
 
-    public override void DoAction()
-    {
-        target.UnderAttack(damage);
-    }
-
     public void GetWeapon()
     {
         throw new System.NotImplementedException();

@@ -11,11 +11,6 @@ public class SwordAttack : AbstractAttackAction, IWeaponAttack
         preConditions.Add(Condition.hasSword, true);
     }
 
-    public override void DoAction()
-    {
-        target.UnderAttack(sword.Damage);
-    }
-
     public void UseWeapon()
     {
         throw new System.NotImplementedException();

@@ -11,7 +11,7 @@ public class AbstractGOAPGraph : AbstractGraph
 
     public override void Search(INode start, INode end)
     {
-        AbstractActionNode endAction = (AbstractActionNode)end;
+        GOAPAction endAction = (GOAPAction)end;
 
         throw new System.NotImplementedException();
     }

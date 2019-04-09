@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class AbstractAttackAction : AbstractActionNode
+public abstract class AbstractAttackAction : GOAPAction
 {
     protected AbstractCreature target;
     protected int cost;
@@ -14,5 +14,10 @@ public abstract class AbstractAttackAction : AbstractActionNode
         cost = c;
         damage = d;
         postConditions.Add(Condition.damageTarget, true);
+    }
+
+    public override void DoAction()
+    {
+        target.UnderAttack(damage);
     }
 }
