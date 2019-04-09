@@ -9,6 +9,10 @@ public class NPC : MonoBehaviour
     public HashSet<GOAPAction> AllActions { get; } = new HashSet<GOAPAction>();
     private HashSet<GOAPAction> currentUsableActions = new HashSet<GOAPAction>();
     GOAPPlanner planner = new GOAPPlanner();
+
+    public Vector2 velocity;
+
+    public float ReachRadius { get; set; }
     // Start is called before the first frame update
     void Awake()
     {
@@ -56,5 +60,10 @@ public class NPC : MonoBehaviour
             plan.Dequeue().DoAction();
             yield return null;
         }
+    }
+
+    public void MoveTo()
+    {
+
     }
 }

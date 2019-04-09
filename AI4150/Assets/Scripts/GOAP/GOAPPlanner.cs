@@ -59,13 +59,13 @@ public class GOAPPlanner
         return plan;
     }
 
-    private HashSet<GOAPAction> GetUsableActions(HashSet<GOAPAction> actions, Dictionary<Condition, object> currentState)
+    private HashSet<GOAPAction> GetUsableActions(HashSet<GOAPAction> actions, Dictionary<Condition, object> state)
     {
         HashSet<GOAPAction> usableActions = new HashSet<GOAPAction>();
         //Gets actions whose postConditions meet our goal
         foreach (GOAPAction action in actions)
         {
-            if (action.CheckPreConditions(currentState))
+            if (action.CheckPreConditions(state))
             {
                 usableActions.Add(action);
             }

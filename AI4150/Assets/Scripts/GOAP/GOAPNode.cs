@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GOAPNode : AbstractNode
+public class GOAPNode
 {
     public GOAPNode parent;
     public GOAPAction action;

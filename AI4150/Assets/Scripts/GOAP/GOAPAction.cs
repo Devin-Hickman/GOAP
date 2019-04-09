@@ -29,13 +29,13 @@ public abstract class GOAPAction : MonoBehaviour
         return res;
     }
 
-    public bool CheckPreConditions(Dictionary<Condition, object> currentState)
+    public virtual bool CheckPreConditions(Dictionary<Condition, object> state)
     {
-        return GetPreConditionsToFulFill(currentState).Count == 0;
+        return GetPreConditionsToFulFill(state).Count == 0;
     }
 
     /// <summary>
-    /// Takes in a state and applies the actions post conditions to it
+    /// Takes in a state and applies the actions post conditions to it. Returns a new state
     /// </summary>
     /// <param name="newState">Updated world state</param>
     public Dictionary<Condition, object> ApplyPostConditionsToState(Dictionary<Condition, object> curState)

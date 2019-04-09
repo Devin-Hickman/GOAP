@@ -8,7 +8,7 @@ public class CraftSword : GOAPAction
     private new void Awake()
     {
         base.Awake();
-        //preConditions.Add(Condition.hasIron, true);
+        preConditions.Add(Condition.hasIron, true);
         postConditions.Add(Condition.hasSword, true);
     }
 
@@ -25,7 +25,7 @@ public class CraftSword : GOAPAction
     private IEnumerator CreateSword()
     {
         Debug.Log("Crafting my sword!");
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(2);
         GameObject sword = Instantiate(Resources.Load("Sword")) as GameObject;
         sword.transform.position = this.transform.position;
     }
