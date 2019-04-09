@@ -19,9 +19,11 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     public List<Tilemap> tileMapRegions;  //Expects tileMaps in order of hierarchy with 0 being the lowest
     public Tilemap obstacleMap;
 
+    PathVisualizer pathVisaulDebugger;
     private void Awake()
     {
         hierarchicalGrids = new PathFindingNode[tileMapRegions.Count][,];
+        pathVisaulDebugger = GetComponent<PathVisualizer>();
     }
 
     void Start()
@@ -188,6 +190,8 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     List<PathFindingNode> UpdateBottomLevelPath(PathFindingNode start, PathFindingNode end)
     {
         List<PathFindingNode> bottomLevelPath = AStar(start, end);
+        pathVisaulDebugger.DrawLines(bottomLevelPath);
+
         for (int i = 0; i < bottomLevelPath.Count; i++)
         {
             pathSoFar.Enqueue(bottomLevelPath[i]);

@@ -134,6 +134,7 @@ GameObject:
   m_Component:
   - component: {fileID: 966688954}
   - component: {fileID: 966688953}
+  - component: {fileID: 966688955}
   m_Layer: 0
   m_Name: PathGraph
   m_TagString: Untagged
@@ -175,6 +176,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &966688955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966688952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e810145983a3e1e438469df5edfb5d84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1489857008
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,6 +201,7 @@ GameObject:
   - component: {fileID: 1489857009}
   - component: {fileID: 1489857013}
   - component: {fileID: 1489857012}
+  - component: {fileID: 1489857014}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -308,6 +322,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1489857014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1489857008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cf122c6298dbcb4ba472627bc77e15a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pathFinder: {fileID: 0}
 --- !u!4 &1598563865 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5583847218125361688, guid: a7eb2eb71d4d1074d98b9ca92ce7d218,
