@@ -136,6 +136,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     private void CreateDebugNode(int x, int y, bool walkable, string name)
     {
         GameObject g = new GameObject();
+        g.transform.parent = GameObject.Find("DebugNodes").transform;
         g.AddComponent<NodeGizmos>();
         g.GetComponent<NodeGizmos>().SetValues(x, y, walkable, name);
     }

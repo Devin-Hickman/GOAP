@@ -5,50 +5,30 @@ using UnityEngine;
 public class Move : MonoBehaviour
 {
     public float speed;
-    private float xVelocity = 0;
-    private float yVelocity = 0;
     Rigidbody2D rb2d;
     bool isMoving = false;
 
+    public Vector2 destination;
 
-    private void Awake()
+    public IEnumerator MoveTo(Vector2 destination)
     {
-        rb2d = GetComponent<Rigidbody2D>();
-    }
-    private void Update()
-    {
+        if(isMoving) yield break;
+
+        isMoving = true;
+        //For when A* is implemented, until then just teleport
+        GetComponent<NPC>().transform.position = destination;
+
+        /*float dist = Vector2.Distance(npc.transform.position, destination);
+        while (dist > 0.1)
+        {
+            Vector2 dir = destination - (Vector2)npc.transform.position;
+            npc.velocity = (dir.normalized * speed);
+            dist = Vector2.Distance(npc.transform.position, destination);
+            yield return null;
+        }
+        npc.velocity = Vector2.zero;*/
+
         isMoving = false;
-        MoveObject();
     }
 
-    private void MoveObject()
-    {
-        if (speed == 0)
-        {
-            Debug.Log("Speed set to 0 for NPC: " + this.name);
-            return;
-        }
-
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            xVelocity = -speed;
-        }else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            xVelocity = speed;
-        } else { xVelocity = 0; }
-
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            yVelocity = -speed;
-        } else if (Input.GetKey(KeyCode.UpArrow))
-        {
-            yVelocity = speed;
-        }
-        else
-        {
-            yVelocity = 0;
-        }
-
-        rb2d.velocity = new Vector2(xVelocity, yVelocity);
-    }
 }
