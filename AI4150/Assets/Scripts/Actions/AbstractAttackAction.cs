@@ -5,7 +5,6 @@ using UnityEngine;
 public abstract class AbstractAttackAction : GOAPAction
 {
     protected AbstractCreature target;
-    protected int cost;
     protected int damage;
 
     private void Awake()

@@ -8,7 +8,7 @@ public class HarvestIron : GOAPAction
     private new void Awake()
     {
         base.Awake();
-        Cost = 50f;
+        cost = 50f;
     }
 
     public override void DoAction()

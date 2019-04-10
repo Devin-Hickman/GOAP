@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Iron : GOAPInteractable
+public class Shop : GOAPInteractable
 {
+
     private void Awake()
     {
-        c = Condition.nearIron;
+        c = Condition.nearShop;
     }
 }

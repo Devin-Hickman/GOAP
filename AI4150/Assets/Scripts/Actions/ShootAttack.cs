@@ -7,7 +7,7 @@ public class ShootAttack : AbstractAttackAction , IWeaponAttack
     private new void Awake()
     {
         base.Awake();
-        Cost = 40f;
+        cost = 40;
     }
 
 

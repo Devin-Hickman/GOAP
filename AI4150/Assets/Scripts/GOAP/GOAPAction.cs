@@ -8,7 +8,7 @@ public abstract class GOAPAction : MonoBehaviour
     protected Dictionary<Condition, object> preConditions = new Dictionary<Condition, object>();
     protected Dictionary<Condition, object> postConditions = new Dictionary<Condition, object>();
     public Dictionary<Condition, object> PostConditions { get { return postConditions; } }
-    public float Cost { get; set; }
+    public float cost;
 
     protected void Awake()
     {

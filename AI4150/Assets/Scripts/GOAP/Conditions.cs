@@ -11,6 +11,8 @@ public enum Condition
     hasTarget,
     damageTarget,
     hasIron,
-    nearIron
+    nearIron,
+    canAfford,
+    nearShop
 }
 

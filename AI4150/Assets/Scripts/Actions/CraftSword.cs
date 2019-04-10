@@ -8,7 +8,7 @@ public class CraftSword : GOAPAction
     private new void Awake()
     {
         base.Awake();
-        Cost = 30f;
+        cost = 300f;
     }
 
     public override void DoAction()
@@ -21,6 +21,7 @@ public class CraftSword : GOAPAction
         Debug.Log("Crafting my sword!");
         yield return new WaitForSeconds(2);
         GameObject sword = Instantiate(Resources.Load("Sword")) as GameObject;
+        sword.GetComponent<SpriteRenderer>().sortingOrder = 1;
         sword.transform.position = this.transform.position;
     }
 

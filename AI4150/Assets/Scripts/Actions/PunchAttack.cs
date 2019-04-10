@@ -7,7 +7,7 @@ public class PunchAttack : AbstractAttackAction
     private new void Awake()
     {
         base.Awake();
-        Cost = 100f;
+        cost = 100f;
     }
 
     protected override void AddPreConditions()

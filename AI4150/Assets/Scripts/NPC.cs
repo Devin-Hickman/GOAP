@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NPC : MonoBehaviour
 {
@@ -12,17 +13,25 @@ public class NPC : MonoBehaviour
 
     public float moveSpeed;
     public Vector2 velocity;
+    public int money = 0;
 
     public float reachRadius;
     public float interactableSearchRadius;
+
+    public Text moneyText;
+    private string defaultMoneyText;
     // Start is called before the first frame update
     void Awake()
     {
         //Creates NPC State
+        defaultMoneyText = moneyText.text;
         foreach(Condition c in Enum.GetValues(typeof(Condition))){
             switch (c)
             {
                 case Condition.nearIron:
+                    npcState.Add(c, float.MaxValue);
+                    break;
+                case Condition.nearShop:
                     npcState.Add(c, float.MaxValue);
                     break;
                 default:
@@ -95,11 +104,17 @@ public class NPC : MonoBehaviour
                 GetComponents<PredictMove>()[i].CreatePostConditions(npcState);
             }
         }
-        Destroy(reachedRadius);
+        //Destroy(reachedRadius);
     }
 
     public void AddGOAPAction(GOAPAction a)
     {
         AllActions.Add(a);
+    }
+
+    public void SetMoney(int m)
+    {
+        money = m;
+        moneyText.text = defaultMoneyText + money;
     }
 }

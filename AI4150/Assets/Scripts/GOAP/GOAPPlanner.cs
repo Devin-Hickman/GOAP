@@ -88,7 +88,7 @@ public class GOAPPlanner
             if (action.CheckPreConditions(root.state))
             {
                 Dictionary<Condition, object> newState = action.ApplyPostConditionsToState(root.state);
-                GOAPNode node = new GOAPNode(root, action, newState, root.costSoFar + action.Cost);
+                GOAPNode node = new GOAPNode(root, action, newState, root.costSoFar + action.cost);
                 
                 if (GoalFromState(goal, newState))
                 {

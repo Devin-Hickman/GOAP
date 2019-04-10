@@ -9,7 +9,7 @@ public class SwordAttack : AbstractAttackAction, IWeaponAttack
     private new void Awake()
     {
         base.Awake();
-        Cost = 50f;
+        cost = 50;
     }
 
     public void UseWeapon()

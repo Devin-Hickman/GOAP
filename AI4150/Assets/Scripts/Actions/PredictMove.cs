@@ -32,7 +32,7 @@ public class PredictMove : GOAPAction
     public static void AddComponent(GameObject agent, float cost, Vector2 dest, float speed, string targetName, int i)
     {
         agent.AddComponent<PredictMove>();
-        agent.GetComponents<PredictMove>()[i].Cost = cost;
+        agent.GetComponents<PredictMove>()[i].cost = cost;
         agent.GetComponents<PredictMove>()[i].predictedPosition = dest;
         agent.GetComponents<PredictMove>()[i].speed = speed;
         agent.GetComponents<PredictMove>()[i].target = targetName;
@@ -66,6 +66,6 @@ public class PredictMove : GOAPAction
                 postConditions = interactableColliders[i].GetComponent<GOAPInteractable>().ApplyPostConditions(new Dictionary<Condition, object>(), dist);
             }
         }
-        Destroy(npcPredictor);
+        //Destroy(npcPredictor);
     }
 }
