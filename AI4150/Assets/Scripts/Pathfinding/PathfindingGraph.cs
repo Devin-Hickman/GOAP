@@ -6,11 +6,11 @@ using System.Linq;
 
 public class PathfindingGraph : MonoBehaviour, IGraph
 {
-    private Queue<PathFindingNode> pathSoFar = new Queue<PathFindingNode>();
+    public List<PathFindingNode> PathSoFar { get; set; }
     private Dictionary<string, PathFindingNode> bottomLevelDict = new Dictionary<string, PathFindingNode>();
 
-    List<PathFindingNode> topLevelPath = new List<PathFindingNode>();
-    List<PathFindingNode> midLevelPath = new List<PathFindingNode>();
+    //List<PathFindingNode> topLevelPath = new List<PathFindingNode>();
+    //List<PathFindingNode> midLevelPath = new List<PathFindingNode>();
 
     //List of grids. Index corresponds to level in hierarchy with 0 being lowest
     PathFindingNode[][,] hierarchicalGrids;
@@ -27,6 +27,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     {
         hierarchicalGrids = new PathFindingNode[tileMapRegions.Count][,];
         pathVisaulDebugger = GetComponent<PathVisualizer>();
+        PathSoFar = new List<PathFindingNode>();
     }
 
     void Start()
@@ -281,13 +282,40 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     */
     public void Search(INode start, INode end)
     {
+        if(start == null || end == null || !((PathFindingNode)start).IsWalkable || !((PathFindingNode)end).IsWalkable)
+        {
+            // invalid node sent
+            return;
+        }
+        PathSoFar = new List<PathFindingNode>(); ;
         PathFindingNode result = AStar((PathFindingNode)start, (PathFindingNode)end);
+        if(result == null)
+        {
+            // No path was found.
+            return;
+        }
+        int count = 0;
         while(result.Parent != null)
         {
-            pathSoFar.Enqueue(result);
+            if (PathSoFar.Contains(result))
+            {
+                // might put logic here to find the previous identical path and set it's parent to this parent.
+                return;
+            }
+            if (result.GetName.Equals(((PathFindingNode)result.Parent).GetName))
+            {
+                // cyclical path. Can't have that. 
+                return;
+            }
+            if(count > 254)
+            {
+                return;
+            }
+            PathSoFar.Insert(0, result);
             result = (PathFindingNode)result.Parent;
+            count++;
         }
-        pathVisaulDebugger.DrawLines(pathSoFar.ToList());
+        pathVisaulDebugger.DrawLines(PathSoFar);
         return;
     }
 
