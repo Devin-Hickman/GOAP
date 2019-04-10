@@ -9,7 +9,7 @@ public class PathMaker : MonoBehaviour
     List<PathFindingNode> path;
     [SerializeField]
     private PathfindingGraph pathFinder;
-    public float speed = 1;
+    private float speed = 0.01f;
 
     private void Awake()
     {

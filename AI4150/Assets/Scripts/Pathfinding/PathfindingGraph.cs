@@ -297,6 +297,10 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         int count = 0;
         while(result.Parent != null)
         {
+            if(result.CostSoFar == 0)
+            {
+                break;
+            }
             if (PathSoFar.Contains(result))
             {
                 // might put logic here to find the previous identical path and set it's parent to this parent.
