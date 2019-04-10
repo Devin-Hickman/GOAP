@@ -10,15 +10,25 @@ public class NPC : MonoBehaviour
     private HashSet<GOAPAction> currentUsableActions = new HashSet<GOAPAction>();
     GOAPPlanner planner = new GOAPPlanner();
 
+    public float moveSpeed;
     public Vector2 velocity;
 
-    public float ReachRadius { get; set; }
+    public float reachRadius;
+    public float interactableSearchRadius;
     // Start is called before the first frame update
     void Awake()
     {
         //Creates NPC State
         foreach(Condition c in Enum.GetValues(typeof(Condition))){
-            npcState.Add(c,false);
+            switch (c)
+            {
+                case Condition.nearIron:
+                    npcState.Add(c, float.MaxValue);
+                    break;
+                default:
+                    npcState.Add(c, false);
+                    break;
+            }
         }
     }
 
@@ -33,6 +43,7 @@ public class NPC : MonoBehaviour
                 currentUsableActions.Add(action);
             }
         }
+        FindInteractablesInMoveRadius();
     }
 
     public Dictionary<Condition, object> GetNPCState()
@@ -62,8 +73,33 @@ public class NPC : MonoBehaviour
         }
     }
 
-    public void MoveTo()
+    public void FindInteractablesInMoveRadius()
     {
+        ContactFilter2D cf2d = new ContactFilter2D();
+        cf2d.layerMask = LayerMask.GetMask("Items");
+        cf2d.useLayerMask = true;
 
+        CircleCollider2D reachedRadius = gameObject.AddComponent<CircleCollider2D>();
+        reachedRadius.radius = interactableSearchRadius;
+        reachedRadius.isTrigger = true;
+
+        Collider2D[] interactableColliders = new Collider2D[100];
+        int numInteractables = reachedRadius.OverlapCollider(cf2d, interactableColliders);
+
+        if (numInteractables != 0)
+        {
+            for (int i = 0; i < numInteractables; i++)
+            {
+                float dist = Mathf.Abs(Vector3.Distance(transform.position, interactableColliders[i].transform.position));
+                PredictMove.AddComponent(gameObject, dist, interactableColliders[i].transform.position, moveSpeed, interactableColliders[i].name, i);
+                GetComponents<PredictMove>()[i].CreatePostConditions(npcState);
+            }
+        }
+        Destroy(reachedRadius);
+    }
+
+    public void AddGOAPAction(GOAPAction a)
+    {
+        AllActions.Add(a);
     }
 }

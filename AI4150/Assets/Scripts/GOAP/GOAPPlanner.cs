@@ -23,7 +23,7 @@ public class GOAPPlanner
 
         GOAPNode root = new GOAPNode(null, null, currentNPCState, 0);
         List<GOAPNode> nodes = new List<GOAPNode>();
-        BuildGraph(root, usableActions, goal,0,solutionNodes);
+        BuildGraph(root, agent.AllActions, goal,0,solutionNodes);
 
         Debug.Log("There's are " + solutionNodes.Count + " ways to do this!");
         if (solutionNodes.Count == 0) return null;
@@ -97,7 +97,7 @@ public class GOAPPlanner
                 else
                 {
                     usedActions.Add(action);
-                    BuildGraph(node, usedActions, goal, searchDepth + 1, solutionNodes);
+                    BuildGraph(node, usableActions, goal, searchDepth + 1, solutionNodes);
                     usedActions.Remove(action);
                 } 
             }
@@ -115,8 +115,6 @@ public class GOAPPlanner
                 bool t = state.ContainsKey(kvp.Key);
                 if(t)
                 {
-                    Debug.Log("State = " + state[kvp.Key]);
-                    Debug.Log("KVP = " + kvp.Value);
                 }
                 bool f = state[kvp.Key] == kvp.Value;
                 return false;

@@ -8,16 +8,18 @@ public abstract class AbstractAttackAction : GOAPAction
     protected int cost;
     protected int damage;
 
-    public AbstractAttackAction(AbstractCreature t, int c, int d)
+    private void Awake()
     {
-        target = t;
-        cost = c;
-        damage = d;
-        postConditions.Add(Condition.damageTarget, true);
+        preConditions.Add(Condition.hasTarget, true);
     }
 
     public override void DoAction()
     {
         target.UnderAttack(damage);
+    }
+
+    protected override void AddPostConditions()
+    {
+        postConditions.Add(Condition.damageTarget, true);
     }
 }

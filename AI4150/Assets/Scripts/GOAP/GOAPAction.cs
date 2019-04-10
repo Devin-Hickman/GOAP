@@ -14,6 +14,9 @@ public abstract class GOAPAction : MonoBehaviour
     {
         preConditions = new Dictionary<Condition, object>();
         postConditions = new Dictionary<Condition, object>();
+        AddPostConditions();
+        AddPreConditions();
+
     }
 
     public Dictionary<Condition, object> GetPreConditionsToFulFill(Dictionary<Condition, object> currentState)
@@ -21,7 +24,7 @@ public abstract class GOAPAction : MonoBehaviour
         Dictionary<Condition, object> res = new Dictionary<Condition, object>();
         foreach (KeyValuePair<Condition, object> kvp in preConditions)
         {
-            if(!currentState.ContainsKey(kvp.Key) || currentState[kvp.Key] != kvp.Value)
+            if(!currentState.ContainsKey(kvp.Key) || !currentState[kvp.Key].Equals(kvp.Value))
             {
                 res.Add(kvp.Key, kvp.Value);
             }
@@ -38,7 +41,7 @@ public abstract class GOAPAction : MonoBehaviour
     /// Takes in a state and applies the actions post conditions to it. Returns a new state
     /// </summary>
     /// <param name="newState">Updated world state</param>
-    public Dictionary<Condition, object> ApplyPostConditionsToState(Dictionary<Condition, object> curState)
+    public virtual Dictionary<Condition, object> ApplyPostConditionsToState(Dictionary<Condition, object> curState)
     {
         Dictionary<Condition, object> newState = new Dictionary<Condition, object>(curState);
         foreach(KeyValuePair<Condition, object> kvp in postConditions)
@@ -56,4 +59,6 @@ public abstract class GOAPAction : MonoBehaviour
     }
 
     public abstract void DoAction();
+    protected abstract void AddPreConditions();
+    protected abstract void AddPostConditions();
 }

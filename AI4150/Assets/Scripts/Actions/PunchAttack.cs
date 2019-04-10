@@ -3,8 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PunchAttack : AbstractAttackAction
-{   
-    PunchAttack(AbstractCreature target, int cost, int damage) : base(target, cost, damage)
+{
+    private new void Awake()
     {
+        base.Awake();
+        Cost = 100f;
+    }
+
+    protected override void AddPreConditions()
+    {
+
     }
 }

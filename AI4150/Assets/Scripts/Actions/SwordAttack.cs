@@ -9,17 +9,17 @@ public class SwordAttack : AbstractAttackAction, IWeaponAttack
     private new void Awake()
     {
         base.Awake();
-        preConditions.Add(Condition.hasSword, true);
-    }
-
-    public SwordAttack(AbstractCreature target, int cost, int damage) : base(target, cost, damage)
-    {
-        preConditions.Add(Condition.hasSword, true);
+        Cost = 50f;
     }
 
     public void UseWeapon()
     {
         throw new System.NotImplementedException();
+    }
+
+    protected override void AddPreConditions()
+    {
+        preConditions.Add(Condition.hasSword, true);
     }
 
 }

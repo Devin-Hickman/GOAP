@@ -8,6 +8,7 @@ public enum Condition
     hasSword,
     hasRangedWeapon,
     hasTool,
+    hasTarget,
     damageTarget,
     hasIron,
     nearIron

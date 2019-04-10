@@ -10,15 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 3232366696856079777}
   - component: {fileID: 3232366696856079776}
-  - component: {fileID: 3232366696856079779}
   - component: {fileID: 3232366696856079783}
   - component: {fileID: 3232366696856079782}
   - component: {fileID: 3232366696856079787}
-  - component: {fileID: 3232366696856079786}
-  - component: {fileID: 3232366696856079781}
   - component: {fileID: 3232366696856079780}
   - component: {fileID: 3232366696856079784}
-  m_Layer: 0
+  - component: {fileID: 386343018}
+  - component: {fileID: 386343019}
+  m_Layer: 11
   m_Name: Blacksmith
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,19 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3232366696856079779
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3232366696856079778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ba16b52c6e3f3640842972a47fafe0a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 8
 --- !u!50 &3232366696856079783
 Rigidbody2D:
   serializedVersion: 4
@@ -150,30 +136,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cff4353622f2d7439f6f4a0eccf18a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3232366696856079786
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3232366696856079778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d102b292421fafb4f87163dc5a16d443, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &3232366696856079781
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3232366696856079778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2478e3964d5c6114eb1bcaa740cc1983, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  velocity: {x: 0, y: 0}
+  reachRadius: 1
+  interactableSearchRadius: 4
 --- !u!114 &3232366696856079780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,6 +164,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d0ec97605177064d9e317b30905daeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &386343018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3232366696856079778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70c840202ca2b6c498c3fe26217b289f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &386343019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3232366696856079778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ba16b52c6e3f3640842972a47fafe0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 0
+  destination: {x: 0, y: 0}
 --- !u!1 &3232366697396432714
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,13 +7,9 @@ public class ShootAttack : AbstractAttackAction , IWeaponAttack
     private new void Awake()
     {
         base.Awake();
-        preConditions.Add(Condition.hasRangedWeapon, true);
+        Cost = 40f;
     }
 
-    public ShootAttack(AbstractCreature target, int cost, int damage) : base(target, cost, damage)
-    {
-        preConditions.Add(Condition.hasRangedWeapon, true);
-    }
 
     public void GetWeapon()
     {
@@ -24,4 +20,10 @@ public class ShootAttack : AbstractAttackAction , IWeaponAttack
     {
         throw new System.NotImplementedException();
     }
+
+    protected override void AddPreConditions()
+    {
+        preConditions.Add(Condition.hasRangedWeapon, true);
+    }
+
 }

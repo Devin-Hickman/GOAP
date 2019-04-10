@@ -8,13 +8,7 @@ public class CraftSword : GOAPAction
     private new void Awake()
     {
         base.Awake();
-        preConditions.Add(Condition.hasIron, true);
-        postConditions.Add(Condition.hasSword, true);
-    }
-
-    public CraftSword()
-    {
-        postConditions.Add(Condition.hasSword, true);
+        Cost = 30f;
     }
 
     public override void DoAction()
@@ -28,5 +22,15 @@ public class CraftSword : GOAPAction
         yield return new WaitForSeconds(2);
         GameObject sword = Instantiate(Resources.Load("Sword")) as GameObject;
         sword.transform.position = this.transform.position;
+    }
+
+    protected override void AddPreConditions()
+    {
+        preConditions.Add(Condition.hasIron, true);
+    }
+
+    protected override void AddPostConditions()
+    {
+        postConditions.Add(Condition.hasSword, true);
     }
 }
