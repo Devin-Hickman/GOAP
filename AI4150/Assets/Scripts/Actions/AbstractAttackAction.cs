@@ -12,9 +12,10 @@ public abstract class AbstractAttackAction : GOAPAction
         preConditions.Add(Condition.hasTarget, true);
     }
 
-    public override void DoAction()
+    public override IEnumerator DoAction()
     {
         target.UnderAttack(damage);
+        yield return null;
     }
 
     protected override void AddPostConditions()

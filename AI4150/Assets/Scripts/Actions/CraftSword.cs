@@ -11,9 +11,9 @@ public class CraftSword : GOAPAction
         cost = 300f;
     }
 
-    public override void DoAction()
+    public override IEnumerator DoAction()
     {
-        StartCoroutine(CreateSword());
+        yield return CreateSword();
     }
 
     private IEnumerator CreateSword()

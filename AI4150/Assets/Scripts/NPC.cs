@@ -77,8 +77,7 @@ public class NPC : MonoBehaviour
         Debug.Log("Time to do this thing!");
         while(plan.Count > 0)
         {
-            plan.Dequeue().DoAction();
-            yield return null;
+            yield return plan.Dequeue().DoAction();
         }
     }
 

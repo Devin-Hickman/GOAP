@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 3232366696856079784}
   - component: {fileID: 386343018}
   - component: {fileID: 386343019}
+  - component: {fileID: 4444454900729764951}
   m_Layer: 11
   m_Name: Blacksmith
   m_TagString: Untagged
@@ -138,8 +139,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   velocity: {x: 0, y: 0}
+  money: 0
   reachRadius: 1
   interactableSearchRadius: 4
+  moneyText: {fileID: 0}
 --- !u!114 &3232366696856079780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,6 +155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c221871fc36e6264a91529e0af86be90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cost: 0
 --- !u!114 &3232366696856079784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -164,6 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d0ec97605177064d9e317b30905daeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cost: 0
 --- !u!114 &386343018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,6 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70c840202ca2b6c498c3fe26217b289f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cost: 0
 --- !u!114 &386343019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,6 +196,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0
   destination: {x: 0, y: 0}
+--- !u!114 &4444454900729764951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3232366696856079778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cf122c6298dbcb4ba472627bc77e15a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pathFinder: {fileID: 0}
 --- !u!1 &3232366697396432714
 GameObject:
   m_ObjectHideFlags: 0

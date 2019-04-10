@@ -51,7 +51,13 @@ public class PathfindingGraph : MonoBehaviour, IGraph
      */ 
     public PathFindingNode GetNearestNode(float x, float y)
     {
-        string key = string.Format("{0:N0}", Mathf.Round(x)) + "," + string.Format("{0:N0}", Mathf.Round(y));
+        float tmpX = Mathf.Round(x);
+        float tmpY = Mathf.Round(y);
+
+        x = (tmpX > x) ? Mathf.Floor(x) + 0.5f : Mathf.Ceil(x) - 0.5f;
+        y = (tmpY > y) ? Mathf.Floor(y) + 0.5f : Mathf.Ceil(y) - 0.5f;
+
+        string key = string.Format("{0:N1}", x + "," + string.Format("{0:N1}", y));
         try
         {
             return this.bottomLevelDict[key];
@@ -81,6 +87,12 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         return res;
     }
 
+    /*
+     * Iteater over entire low-level grid
+     * Iterate over n grid + 1 tileMaps (List<TileMaps>)
+     * Check to see if Tilemap t contains Tile at point x,y
+     * */
+
     /**
      * Builds the lowest level of the graph using the tiles and updates the hierarchicalGrids object with that lowest level
      */
@@ -92,25 +104,25 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         hierarchicalGrids[currentLevel] = CreateLowLevelGrid();
         int nodesMade = 0;
 
-        for (int x = (int)gridStartPos.position.x; x < gridEndPos.position.x; x += gridCellSize)
+        for (float x = gridStartPos.position.x; x < gridEndPos.position.x; x += gridCellSize)
         {
             xIndex++;
             yIndex = -1;
-            for (int y = (int)gridStartPos.position.y; y < gridEndPos.position.y; y += gridCellSize)
+            for (float y = gridStartPos.position.y; y < gridEndPos.position.y; y += gridCellSize)
             {
                 PathFindingNode tmp = null;
-                TileBase tileBase = tileMapRegions[currentLevel].GetTile(new Vector3Int(x, y, 0));
+                TileBase tileBase = tileMapRegions[currentLevel].GetTile(new Vector3Int((int)x, (int)y, 0));
                 if (tileBase != null) // Tile exists
                 {
                     nodesMade++;
-                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int(x, y, 0));
+                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int((int)x, (int)y, 0));
                     bool walkable = (obstacleBase == null) ? true : false;
                     tmp = new PathFindingNode(new Vector2(x, y), walkable);
                     CreateDebugNode(x, y, walkable, "L" + currentLevel + " N" +nodesMade);
                 }
                 else
                 {
-                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int(x, y, 0));
+                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int((int)x, (int)y, 0));
                     if(obstacleBase != null)
                     {
                         nodesMade++;
@@ -133,7 +145,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     * Creates the nodes that are visible to the developer
     * 
     */
-    private void CreateDebugNode(int x, int y, bool walkable, string name)
+    private void CreateDebugNode(float x, float y, bool walkable, string name)
     {
         GameObject g = new GameObject();
         g.transform.parent = GameObject.Find("DebugNodes").transform;
@@ -301,20 +313,6 @@ public class PathfindingGraph : MonoBehaviour, IGraph
             if(result.CostSoFar == 0)
             {
                 break;
-            }
-            if (PathSoFar.Contains(result))
-            {
-                // might put logic here to find the previous identical path and set it's parent to this parent.
-                return;
-            }
-            if (result.GetName.Equals(((PathFindingNode)result.Parent).GetName))
-            {
-                // cyclical path. Can't have that. 
-                return;
-            }
-            if(count > 254)
-            {
-                return;
             }
             PathSoFar.Insert(0, result);
             result = (PathFindingNode)result.Parent;

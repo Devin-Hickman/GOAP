@@ -7,7 +7,7 @@ public class NodeGizmos : MonoBehaviour
     public bool walkable;
 
 
-    public void SetValues(int x_, int y_, bool w, string s)
+    public void SetValues(float x_, float y_, bool w, string s)
     {
         this.transform.position = new Vector3(x_, y_, 1);
         walkable = w;

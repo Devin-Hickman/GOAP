@@ -13,13 +13,14 @@ public class BuySword : GOAPAction
         cost = 10;
     }
 
-    public override void DoAction()
+    public override IEnumerator DoAction()
     {
         Debug.Log("Bought a sword!");
         GameObject sword = Instantiate(Resources.Load("Sword")) as GameObject;
         sword.GetComponent<SpriteRenderer>().sortingOrder = 1;
         sword.transform.position = this.transform.position;
         GetComponent<NPC>().SetMoney(GetComponent<NPC>().money - swordPrice);
+        yield return null;
     }
 
     protected override void AddPostConditions()

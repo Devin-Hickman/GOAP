@@ -11,9 +11,10 @@ public class HarvestIron : GOAPAction
         cost = 50f;
     }
 
-    public override void DoAction()
+    public override IEnumerator DoAction()
     {
         Debug.Log("you got some iron!");
+        yield return null;
     }
 
     public override bool CheckPreConditions(Dictionary<Condition, object> currentState)

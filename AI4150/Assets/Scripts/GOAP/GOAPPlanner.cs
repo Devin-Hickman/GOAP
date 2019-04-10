@@ -122,17 +122,4 @@ public class GOAPPlanner
         }
         return true;
     }
-
-    private bool GoalFromAction(Dictionary<Condition, object> goals, GOAPAction action)
-        {
-            //Iterate through all goal states in goals. If the action can fulfill all goals then return true, else return false
-            foreach (KeyValuePair<Condition, object> kvp in goals)
-            {
-                if (!action.PostConditions.ContainsKey(kvp.Key) && action.PostConditions[kvp.Key] != kvp.Value)
-                {
-                    return false;
-                }
-            }
-        return true;
-    }
 }

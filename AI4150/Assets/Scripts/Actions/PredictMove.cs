@@ -14,10 +14,11 @@ public class PredictMove : GOAPAction
         base.Awake();
     }
 
-    public override void DoAction()
+    public override IEnumerator DoAction()
     {
-        StartCoroutine(GetComponent<Move>().MoveTo(predictedPosition));
+        yield return GetComponent<PathMaker>().MoveTowards(predictedPosition);
     }
+
     protected override void AddPreConditions()
     {
         //No preConditions

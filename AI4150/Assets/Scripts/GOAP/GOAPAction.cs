@@ -16,7 +16,6 @@ public abstract class GOAPAction : MonoBehaviour
         postConditions = new Dictionary<Condition, object>();
         AddPostConditions();
         AddPreConditions();
-
     }
 
     public Dictionary<Condition, object> GetPreConditionsToFulFill(Dictionary<Condition, object> currentState)
@@ -58,7 +57,7 @@ public abstract class GOAPAction : MonoBehaviour
         return newState;
     }
 
-    public abstract void DoAction();
+    public abstract IEnumerator DoAction();
     protected abstract void AddPreConditions();
     protected abstract void AddPostConditions();
 }
