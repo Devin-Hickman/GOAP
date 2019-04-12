@@ -370,7 +370,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1476202281}
         m_MethodName: SetMoney
         m_Mode: 3
         m_Arguments:
@@ -954,7 +954,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1476202281}
         m_MethodName: INeedSword
         m_Mode: 1
         m_Arguments:
@@ -1503,6 +1503,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cost: 0
+--- !u!114 &1476202281 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3232366696856079787, guid: e02d85f469a03114f85d7793c9cb29d5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1476202278}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1476202279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cff4353622f2d7439f6f4a0eccf18a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1550157553
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1961,7 +1973,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1476202281}
         m_MethodName: SetMoney
         m_Mode: 3
         m_Arguments:
@@ -2022,6 +2034,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Grid
+      objectReference: {fileID: 0}
+    - target: {fileID: 5533030196998727234, guid: f4029666a253cc149846e1bab7131cb7,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 48.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5533030196998727234, guid: f4029666a253cc149846e1bab7131cb7,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 29.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5533030196966073036, guid: f4029666a253cc149846e1bab7131cb7,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -29.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5533030196966073036, guid: f4029666a253cc149846e1bab7131cb7,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -23.5
       objectReference: {fileID: 0}
     - target: {fileID: 5533030196572894081, guid: f4029666a253cc149846e1bab7131cb7,
         type: 3}

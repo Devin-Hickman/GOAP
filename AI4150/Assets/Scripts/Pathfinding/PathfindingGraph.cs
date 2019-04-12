@@ -117,17 +117,17 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                     nodesMade++;
                     TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int((int)x, (int)y, 0));
                     bool walkable = (obstacleBase == null) ? true : false;
-                    tmp = new PathFindingNode(new Vector2(x, y), walkable);
-                    CreateDebugNode(x, y, walkable, "L" + currentLevel + " N" +nodesMade);
+                    tmp = new PathFindingNode(new Vector2(x+1, y+1), walkable);
+                    CreateDebugNode(x+1, y+1, walkable, "L" + currentLevel + " N" +nodesMade);
                 }
                 else
                 {
-                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int((int)x, (int)y, 0));
+                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int((int)x+1, (int)y-1, 0));
                     if(obstacleBase != null)
                     {
                         nodesMade++;
-                        tmp = new PathFindingNode(new Vector2(x, y), false);
-                        CreateDebugNode(x, y, false, "L" + currentLevel + " N" + nodesMade);
+                        tmp = new PathFindingNode(new Vector2(x+1, y+1), false);
+                        CreateDebugNode(x+1, y+1, false, "L" + currentLevel + " N" + nodesMade);
                     }
                 }
                 yIndex++;
