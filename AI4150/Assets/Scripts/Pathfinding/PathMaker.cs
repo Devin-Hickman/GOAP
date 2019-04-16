@@ -11,6 +11,7 @@ public class PathMaker : MonoBehaviour
     private PathfindingGraph pathFinder;
     private float speed;
     private NPC n;
+    private bool rightClick = false;
 
     private void Awake()
     {
@@ -47,12 +48,13 @@ public class PathMaker : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
+            rightClick = true;
             Vector3 npcPos = rb2d.position;
             PathFindingNode start = pathFinder.GetNearestNode(npcPos.x, npcPos.y);
-            path = null;
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             PathFindingNode end = pathFinder.GetNearestNode(pos.x, pos.y);
-
+            path = null;
+            rightClick = false;
             pathFinder.Search(start, end);
             currentPathIndex = 0;
 
@@ -72,10 +74,9 @@ public class PathMaker : MonoBehaviour
         // move towards path[currentIndex]
         while (currentNode != end)
         {
-            if(path == null)
+            if(path == null || rightClick)
             {
-                yield return Move(new Vector2(currentNode.GetX, currentNode.GetY));
-                break;
+                yield break;
             }
             currentNode = path[currentPathIndex];
             yield return Move(new Vector2(currentNode.GetX, currentNode.GetY));
