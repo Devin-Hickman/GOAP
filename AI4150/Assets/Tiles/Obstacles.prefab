@@ -46,7 +46,7 @@ Tilemap:
       m_TileIndex: 4
       m_TileSpriteIndex: 4
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
+      m_TileColorIndex: 1
       m_ObjectToInstantiate: {fileID: 0}
       m_TileFlags: 1
       m_ColliderType: 1
@@ -86,6 +86,24 @@ Tilemap:
       m_ObjectToInstantiate: {fileID: 0}
       m_TileFlags: 1
       m_ColliderType: 1
+  - first: {x: -3, y: 0, z: 0}
+    second:
+      m_TileIndex: 6
+      m_TileSpriteIndex: 6
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_ObjectToInstantiate: {fileID: 0}
+      m_TileFlags: 1
+      m_ColliderType: 1
+  - first: {x: -3, y: 1, z: 0}
+    second:
+      m_TileIndex: 6
+      m_TileSpriteIndex: 6
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_ObjectToInstantiate: {fileID: 0}
+      m_TileFlags: 1
+      m_ColliderType: 1
   - first: {x: -2, y: 1, z: 0}
     second:
       m_TileIndex: 5
@@ -109,6 +127,8 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: ccb177b4c731ec04c9c99ea48b5e2e6a, type: 2}
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 2c6dce17898521f4aaad69981213d8f2, type: 2}
+  - m_RefCount: 2
+    m_Data: {fileID: 11400000, guid: e7ab60da0ebdd494fa008e31e4172ebc, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 1
     m_Data: {fileID: 21300076, guid: 6b0306f9773574f42b7029480930b39d, type: 3}
@@ -122,8 +142,10 @@ Tilemap:
     m_Data: {fileID: 21300018, guid: 6b0306f9773574f42b7029480930b39d, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 21300054, guid: 6b0306f9773574f42b7029480930b39d, type: 3}
+  - m_RefCount: 2
+    m_Data: {fileID: 21300042, guid: 6b0306f9773574f42b7029480930b39d, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 6
+  - m_RefCount: 8
     m_Data:
       e00: 1
       e01: 0
@@ -142,8 +164,10 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 6
+  - m_RefCount: 7
     m_Data: {r: 1, g: 1, b: 1, a: 1}
+  - m_RefCount: 1
+    m_Data: {r: 0, g: 0, b: 0, a: 1}
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -3, y: -2, z: 0}

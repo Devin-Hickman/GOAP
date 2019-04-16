@@ -72,6 +72,11 @@ public class PathMaker : MonoBehaviour
         // move towards path[currentIndex]
         while (currentNode != end)
         {
+            if(path == null)
+            {
+                yield return Move(new Vector2(currentNode.GetX, currentNode.GetY));
+                break;
+            }
             currentNode = path[currentPathIndex];
             yield return Move(new Vector2(currentNode.GetX, currentNode.GetY));
             currentPathIndex++;
@@ -86,7 +91,10 @@ public class PathMaker : MonoBehaviour
 
                 }*/            
         }
-        yield return Move(new Vector2(end.GetX, end.GetY));
+        if (currentNode == end)
+        {
+            yield return Move(new Vector2(end.GetX, end.GetY));
+        }
     }
 
     protected IEnumerator Move(Vector2 destination)
