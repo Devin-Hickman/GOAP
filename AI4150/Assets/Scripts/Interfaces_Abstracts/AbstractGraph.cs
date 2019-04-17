@@ -11,7 +11,7 @@ public abstract class AbstractGraph : MonoBehaviour, IGraph
         throw new System.NotImplementedException();
     }
 
-    public abstract void Search(INode start, INode end);
+    public abstract void Search(AbstractNode start, AbstractNode end);
 
     //public abstract void Search(INode start, INode end, FindNextNode heuristic);
 }

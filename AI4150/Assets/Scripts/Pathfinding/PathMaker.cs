@@ -6,7 +6,7 @@ public class PathMaker : MonoBehaviour
 {
     Rigidbody2D rb2d;
     private int currentPathIndex = 0;
-    List<PathFindingNode> path;
+    List<AbstractNode> path;
     [SerializeField]
     private PathfindingGraph pathFinder;
     private float speed;
@@ -64,7 +64,7 @@ public class PathMaker : MonoBehaviour
         }
     }
     
-    private IEnumerator MoveNPCWithPath(PathFindingNode currentNode, PathFindingNode end)
+    private IEnumerator MoveNPCWithPath(AbstractNode currentNode, AbstractNode end)
     {
         path = pathFinder.PathSoFar;
         if (path == null || path.Count == 0) yield break;
@@ -72,7 +72,7 @@ public class PathMaker : MonoBehaviour
         // store what index we think we are on. 
         // check if start has the same name as the index we are on if it is the same then we increment the index
         // move towards path[currentIndex]
-        while (currentNode != end)
+        while (currentNode != end && currentPathIndex < path.Count)
         {
             if(path == null || rightClick)
             {

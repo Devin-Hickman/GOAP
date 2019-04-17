@@ -9,6 +9,6 @@ public interface IGraph
     void BuildGraph();
 
     // the public search is just a public wrapper on private search that throws the heuristic at the private search
-    void Search(INode start, INode end);
+    void Search(AbstractNode start, AbstractNode end);
     //void Search(INode start, INode end, FindNextNode heuristic);
 }

@@ -9,9 +9,9 @@ public class AbstractGOAPGraph : AbstractGraph
         throw new System.NotImplementedException();
     }
 
-    public override void Search(INode start, INode end)
+    public override void Search(AbstractNode start, AbstractNode end)
     {
-        GOAPAction endAction = (GOAPAction)end;
+        //GOAPAction endAction = (GOAPAction)end;
 
         throw new System.NotImplementedException();
     }

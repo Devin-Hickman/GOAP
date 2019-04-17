@@ -21,6 +21,7 @@ public class ParentRegionNode : AbstractNode
         TileSprite = tileSprite;
         BorderNodes = new Dictionary<string, List<AbstractNode>>();
         ChildNodes = new List<AbstractNode>();
+        neighbors = new List<INode>();
     }
 
     public void AddToChildNodes(AbstractNode childNode)
@@ -40,6 +41,11 @@ public class ParentRegionNode : AbstractNode
             BorderNodes[sprite] = new List<AbstractNode>();
         }
         BorderNodes[sprite].Add(childNode);
+
+        if(!neighbors.Contains(neighbor))
+        {
+            neighbors.Add(neighbor);
+        }
     }
 
     /**
@@ -57,6 +63,26 @@ public class ParentRegionNode : AbstractNode
             ySum += child.GetY;
         }
         this.Pos = new Vector2(xSum / ChildNodes.Count, ySum / ChildNodes.Count);
+    }
+
+    // This looks at all of the border nodes, finds the closest one to the position and then returns it
+    public AbstractNode GetClosestBorderNode(Vector2 pos, string targetRegion)
+    {
+        if(!BorderNodes.ContainsKey(targetRegion))
+        {
+            throw new Exception("Target region is not a neighbor");
+        }
+        double shortestDist = Double.MaxValue;
+        AbstractNode bestNode = null;
+        foreach(AbstractNode node in BorderNodes[targetRegion])
+        {
+            double temp = Math.Sqrt(Math.Pow(pos.x - node.GetX, 2) + Math.Pow(pos.y - node.GetY, 2));
+            if(temp < shortestDist)
+            {
+                bestNode = node;
+            }
+        }
+        return bestNode;
     }
 
     public override int Heuristic(AbstractNode toBeCompared, AbstractNode goalNode)
