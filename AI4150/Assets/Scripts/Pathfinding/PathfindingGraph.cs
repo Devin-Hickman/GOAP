@@ -343,6 +343,9 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                     neighbor.CostSoFar = costSoFar;
                     lookUpTable.Add(neighbor.GetName, neighbor);
                     priorityQueue.Enqueue(neighbor);
+                } else
+                {
+                    lookUpTable[neighbor.GetName].CostSoFar = costSoFar;
                 }
             }
         }
@@ -401,6 +404,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                 // do A* in the mid level heirarchy
                 AbstractNode midResult = AStar(start.ParentRegion, end.ParentRegion);
                 MidPathSoFar.AddRange(GeneratePathFromParents(midResult));
+                pathVisaulDebugger.DrawLines(MidPathSoFar);
             }
         }
         AbstractNode tmpStart = start;
