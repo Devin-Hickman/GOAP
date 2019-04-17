@@ -346,6 +346,10 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                 } else
                 {
                     lookUpTable[neighbor.GetName].CostSoFar = costSoFar;
+                    if(!priorityQueue.IsConsistent())
+                    {
+
+                    }
                 }
             }
         }
