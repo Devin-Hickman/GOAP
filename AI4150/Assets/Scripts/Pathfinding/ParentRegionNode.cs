@@ -28,7 +28,13 @@ public class ParentRegionNode : AbstractNode
         ChildNodes.Add(childNode);
     }
 
-    public void AddToBorderNodes(AbstractNode childNode, string sprite)
+    /**
+     * The child node that is on the border of another node on this level
+     * The sprite is the sprite of the bordering node on this level
+     * The neighbor is the node of the neighbor itself
+     * 
+     * */
+    public void AddToBorderNodes(AbstractNode childNode, string sprite, AbstractNode neighbor)
     {
         if(!BorderNodes.ContainsKey(sprite)) {
             BorderNodes[sprite] = new List<AbstractNode>();

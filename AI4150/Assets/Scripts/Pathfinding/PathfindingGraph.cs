@@ -162,6 +162,27 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         AssignNodeNeighbors();
     }
 
+    private void UpdateMidAndTopLevel(int x, int y, PathFindingNode curNode, PathFindingNode[,] grid, string currentParent, string currentParentsParent)
+    {
+        if (currentParent != null && grid[x, y].ParentRegion != null)
+        {
+            string otherSprite = grid[x, y].ParentRegion.TileSprite;
+            if (!currentParent.Equals(otherSprite))
+            {
+                curNode.ParentRegion.AddToBorderNodes(grid[x, y], otherSprite, grid[x, y].ParentRegion);
+            }
+
+            if (currentParentsParent != null && grid[x, y].ParentRegion.ParentRegion != null)
+            {
+                string otherSprite2 = grid[x, y].ParentRegion.ParentRegion.TileSprite;
+                if (!currentParentsParent.Equals(otherSprite2))
+                {
+                    curNode.ParentRegion.ParentRegion.AddToBorderNodes(grid[x, y].ParentRegion, otherSprite2, grid[x, y].ParentRegion.ParentRegion);
+                }
+            }
+        }
+    }
+
     /**
     * Creates the nodes that are visible to the developer
     * 
@@ -192,60 +213,38 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                         {
                             PathFindingNode curNode = grid[x, y];
                             string currentParent = null;
+                            string currentParentsParent = null;
                             if (curNode.ParentRegion != null) {
                                 currentParent = curNode.ParentRegion.TileSprite;
+                                if(curNode.ParentRegion.ParentRegion != null)
+                                {
+                                    currentParentsParent = curNode.ParentRegion.ParentRegion.TileSprite;
+                                }
                             }
 
                             int xTmp = x - 1;
                             if (xTmp > 0 && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) {
                                 curNode.AddNeighbor(grid[xTmp, y]);
-                                if(currentParent != null && grid[xTmp, y].ParentRegion != null)
-                                {
-                                    string otherSprite = grid[xTmp, y].ParentRegion.TileSprite;
-                                    if (!currentParent.Equals(otherSprite))
-                                    {
-                                        curNode.ParentRegion.AddToBorderNodes(grid[xTmp, y], otherSprite);
-                                    }
-                                }
+                                UpdateMidAndTopLevel(xTmp, y, curNode, grid, currentParent, currentParentsParent);
+
                             }
 
                             xTmp = x + 1;
                             if (xTmp < grid.GetLength(0) && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) {
                                 curNode.AddNeighbor(grid[xTmp, y]);
-                                if (currentParent != null && grid[xTmp, y].ParentRegion != null)
-                                {
-                                    string otherSprite = grid[xTmp, y].ParentRegion.TileSprite;
-                                    if (!currentParent.Equals(otherSprite))
-                                    {
-                                        curNode.ParentRegion.AddToBorderNodes(grid[xTmp, y], otherSprite);
-                                    }
-                                }
+                                UpdateMidAndTopLevel(xTmp, y, curNode, grid, currentParent, currentParentsParent);
                             }
 
                             int yTmp = y - 1;
                             if (yTmp > 0 && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) {
                                 curNode.AddNeighbor(grid[x, yTmp]);
-                                if (currentParent != null && grid[x, yTmp].ParentRegion != null)
-                                {
-                                    string otherSprite = grid[x, yTmp].ParentRegion.TileSprite;
-                                    if (!currentParent.Equals(otherSprite))
-                                    {
-                                        curNode.ParentRegion.AddToBorderNodes(grid[x, yTmp], otherSprite);
-                                    }
-                                }
+                                UpdateMidAndTopLevel(x, yTmp, curNode, grid, currentParent, currentParentsParent);
                             }
 
                             yTmp = y + 1;
                             if (yTmp < grid.GetLength(1) && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) {
                                 curNode.AddNeighbor(grid[x, yTmp]);
-                                if (currentParent != null && grid[x, yTmp].ParentRegion != null)
-                                {
-                                    string otherSprite = grid[x, yTmp].ParentRegion.TileSprite;
-                                    if (!currentParent.Equals(otherSprite))
-                                    {
-                                        curNode.ParentRegion.AddToBorderNodes(grid[x, yTmp], otherSprite);
-                                    }
-                                }
+                                UpdateMidAndTopLevel(x, yTmp, curNode, grid, currentParent, currentParentsParent);
                             }
 
                         }
@@ -357,6 +356,23 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     * Search
     * This is a generic search function for the algorithm
     * The start and end nodes must be in the same hierarchy and this will find it's way
+    * 
+    * PSEUDOCODE:
+    * Check if parent regions are the same and are not neighbors
+    * if not check if those parents have the same parents
+    * if top level parents not the same and are not neighbors:
+    * A* start.parentRegion.parentRegion, end.parentRegion.parentRegion
+    * Collect the path
+    * if the top level parents are the same or neighbors just start here
+    * get closest border node of next region in top level heirarchy
+    * Do A* in mid level heirarchy from start.ParentRegion to found border node
+    * Collect the path
+    * Get the closest node of the next region in mid level heirarchy
+    * if mid level parents are the same or neighbors just start here.
+    * Do A* in bottom level heirarchy from start to found border node
+    * append the path
+    * Loop on all of the above until we make it or we find the end point is unreachable.
+    * 
     */
     public void Search(INode start, INode end)
     {
