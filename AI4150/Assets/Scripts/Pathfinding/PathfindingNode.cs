@@ -17,9 +17,6 @@ public class PathFindingNode : AbstractNode
         
     }
 
-    private PathFindingNode parentRegion;
-    public PathFindingNode GetParentRegion() { return parentRegion; }
-
     public bool Equals(PathFindingNode obj)
     {
         //Check for null and compare run-time types.

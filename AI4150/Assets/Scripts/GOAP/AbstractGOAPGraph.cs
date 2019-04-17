@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AbstractGOAPGraph : AbstractGraph
 {
-    public override List<INode> BuildGraph()
+    public override void BuildGraph()
     {
         throw new System.NotImplementedException();
     }

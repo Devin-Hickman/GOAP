@@ -8,7 +8,8 @@ public class PathfindingGraph : MonoBehaviour, IGraph
 {
     public List<PathFindingNode> PathSoFar { get; set; }
     private Dictionary<string, PathFindingNode> bottomLevelDict = new Dictionary<string, PathFindingNode>();
-
+    private Dictionary<string, ParentRegionNode> midLevelDict = new Dictionary<string, ParentRegionNode>();
+    private Dictionary<string, ParentRegionNode> topLevelDict = new Dictionary<string, ParentRegionNode>();
     //List<PathFindingNode> topLevelPath = new List<PathFindingNode>();
     //List<PathFindingNode> midLevelPath = new List<PathFindingNode>();
 
@@ -71,20 +72,9 @@ public class PathfindingGraph : MonoBehaviour, IGraph
      * Builds the varying layers of the graph and updates the heirarchicalGrids object accordingly
      * 
      */
-    public List<INode> BuildGraph()
+    public void BuildGraph()
     {
-        List<INode> res = new List<INode>();
-        BuildPathfindingNodes(0);
-        // to build next level of nodes do clustering on the first level of nodes based off of their distance from an estimated center
-        // instantiate clusters estimates with 5 times less nodes than the previous level
-        // do the same thing again on that layer to generate the top level.
-        //int layer = 1;
-        //while(hierarchicalGrids[layer - 1].Length * hierarchicalGrids[layer - 1].Length > 100)
-        //{
-
-        //}
-        //BuildPathfindingNodes(1);
-        return res;
+        BuildPathfindingNodes();
     }
 
     /*
@@ -96,12 +86,12 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     /**
      * Builds the lowest level of the graph using the tiles and updates the hierarchicalGrids object with that lowest level
      */
-    private void BuildPathfindingNodes(int currentLevel)
+    private void BuildPathfindingNodes()
     {
         int xIndex = -1;
         int yIndex = -1;
 
-        hierarchicalGrids[currentLevel] = CreateLowLevelGrid();
+        hierarchicalGrids[0] = CreateLowLevelGrid();
         int nodesMade = 0;
 
         for (float x = gridStartPos.position.x; x < gridEndPos.position.x; x += gridCellSize)
@@ -111,14 +101,17 @@ public class PathfindingGraph : MonoBehaviour, IGraph
             for (float y = gridStartPos.position.y; y < gridEndPos.position.y; y += gridCellSize)
             {
                 PathFindingNode tmp = null;
-                TileBase tileBase = tileMapRegions[currentLevel].GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
+                TileBase tileBase = tileMapRegions[0].GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
+                TileBase parent1TileBase = tileMapRegions[1].GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
+                TileBase parent2TileBase = tileMapRegions[2].GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
+
                 if (tileBase != null) // Tile exists
                 {
                     nodesMade++;
                     TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
                     bool walkable = (obstacleBase == null) ? true : false;
                     tmp = new PathFindingNode(new Vector2(x, y), walkable);
-                    CreateDebugNode(x, y, walkable, "L" + currentLevel + " N" +nodesMade);
+                    CreateDebugNode(x, y, walkable, "L" + 0 + " N" +nodesMade);
                 }
                 else
                 {
@@ -127,7 +120,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                     {
                         nodesMade++;
                         tmp = new PathFindingNode(new Vector2(x, y), false);
-                        CreateDebugNode(x, y, false, "L" + currentLevel + " N" + nodesMade);
+                        CreateDebugNode(x, y, false, "L" + 0 + " N" + nodesMade);
                     }
                 }
                 yIndex++;
@@ -135,8 +128,36 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                 {
                     bottomLevelDict.Add(tmp.GetName, tmp);
                 }
-                hierarchicalGrids[currentLevel][xIndex, yIndex] = tmp;
+                if (tmp != null && parent1TileBase != null && parent2TileBase != null)
+                {
+                    string parent1Sprite = ((Tile)parent1TileBase).sprite.name;
+                    if (!midLevelDict.ContainsKey(parent1Sprite))
+                    {
+                        midLevelDict[parent1Sprite] = new ParentRegionNode(parent1Sprite);
+                    }
+                    midLevelDict[parent1Sprite].AddToChildNodes(tmp);
+                    tmp.ParentRegion = midLevelDict[parent1Sprite];
+
+                    string parent2Sprite = ((Tile)parent2TileBase).sprite.name;
+                    if (!topLevelDict.ContainsKey(parent2Sprite))
+                    {
+                        topLevelDict[parent2Sprite] = new ParentRegionNode(parent2Sprite);
+                    }
+                    topLevelDict[parent2Sprite].AddToChildNodes(midLevelDict[parent1Sprite]);
+                    midLevelDict[parent1Sprite].ParentRegion = topLevelDict[parent2Sprite];
+                }
+                hierarchicalGrids[0][xIndex, yIndex] = tmp;
             }
+        }
+        // right now the mid and top level nodes don't have x and y values. Have them make their own based on
+        // child nodes
+        foreach (KeyValuePair<string, ParentRegionNode> entry in midLevelDict)
+        {
+            entry.Value.CalculatePos();
+        }
+        foreach (KeyValuePair<string, ParentRegionNode> entry in topLevelDict)
+        {
+            entry.Value.CalculatePos();
         }
         AssignNodeNeighbors();
     }
@@ -170,18 +191,62 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                         if (grid[x, y] != null)
                         {
                             PathFindingNode curNode = grid[x, y];
+                            string currentParent = null;
+                            if (curNode.ParentRegion != null) {
+                                currentParent = curNode.ParentRegion.TileSprite;
+                            }
 
                             int xTmp = x - 1;
-                            if (xTmp > 0 && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) { curNode.AddNeighbor(grid[xTmp, y]); }
+                            if (xTmp > 0 && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) {
+                                curNode.AddNeighbor(grid[xTmp, y]);
+                                if(currentParent != null && grid[xTmp, y].ParentRegion != null)
+                                {
+                                    string otherSprite = grid[xTmp, y].ParentRegion.TileSprite;
+                                    if (!currentParent.Equals(otherSprite))
+                                    {
+                                        curNode.ParentRegion.AddToBorderNodes(grid[xTmp, y], otherSprite);
+                                    }
+                                }
+                            }
 
                             xTmp = x + 1;
-                            if (xTmp < grid.GetLength(0) && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) { curNode.AddNeighbor(grid[xTmp, y]); }
+                            if (xTmp < grid.GetLength(0) && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) {
+                                curNode.AddNeighbor(grid[xTmp, y]);
+                                if (currentParent != null && grid[xTmp, y].ParentRegion != null)
+                                {
+                                    string otherSprite = grid[xTmp, y].ParentRegion.TileSprite;
+                                    if (!currentParent.Equals(otherSprite))
+                                    {
+                                        curNode.ParentRegion.AddToBorderNodes(grid[xTmp, y], otherSprite);
+                                    }
+                                }
+                            }
 
                             int yTmp = y - 1;
-                            if (yTmp > 0 && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) { curNode.AddNeighbor(grid[x, yTmp]); }
+                            if (yTmp > 0 && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) {
+                                curNode.AddNeighbor(grid[x, yTmp]);
+                                if (currentParent != null && grid[x, yTmp].ParentRegion != null)
+                                {
+                                    string otherSprite = grid[x, yTmp].ParentRegion.TileSprite;
+                                    if (!currentParent.Equals(otherSprite))
+                                    {
+                                        curNode.ParentRegion.AddToBorderNodes(grid[x, yTmp], otherSprite);
+                                    }
+                                }
+                            }
 
                             yTmp = y + 1;
-                            if (yTmp < grid.GetLength(1) && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) { curNode.AddNeighbor(grid[x, yTmp]); }
+                            if (yTmp < grid.GetLength(1) && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) {
+                                curNode.AddNeighbor(grid[x, yTmp]);
+                                if (currentParent != null && grid[x, yTmp].ParentRegion != null)
+                                {
+                                    string otherSprite = grid[x, yTmp].ParentRegion.TileSprite;
+                                    if (!currentParent.Equals(otherSprite))
+                                    {
+                                        curNode.ParentRegion.AddToBorderNodes(grid[x, yTmp], otherSprite);
+                                    }
+                                }
+                            }
 
                         }
                     }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class AbstractGraph : MonoBehaviour, IGraph
 {
-    public abstract List<INode> BuildGraph();
+    public abstract void BuildGraph();
 
     public List<INode> GetGraph()
     {
