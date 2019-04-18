@@ -4,12 +4,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+
 public class NPC : MonoBehaviour
 {
+
+    protected class Goal
+    {
+        public string goalName;
+        public KeyValuePair<Condition, object> postGoal;
+
+        public Goal(string s, KeyValuePair<Condition, object> goal)
+        {
+            goalName = s;
+            postGoal = goal;
+        }
+    }
+
     private Dictionary<Condition, object> npcState = new Dictionary<Condition, object>();
     public HashSet<GOAPAction> AllActions { get; } = new HashSet<GOAPAction>();
     private HashSet<GOAPAction> currentUsableActions = new HashSet<GOAPAction>();
-    GOAPPlanner planner = new GOAPPlanner();
+    protected GOAPPlanner planner;
 
     public float moveSpeed;
     public Vector2 velocity;
@@ -18,13 +33,25 @@ public class NPC : MonoBehaviour
     public float reachRadius;
     public float interactableSearchRadius;
 
+    static GameObject npcUI;
+
     public Text moneyText;
     private string defaultMoneyText;
+
+    public Text UI_Plan_Text;
+    protected string currentPlan;
+    protected Goal goal1;
+    public Button goal1Button;
+    protected Goal goal2;
+    public Button goal2Button;
+
     // Start is called before the first frame update
-    void Awake()
+    protected virtual void Awake()
     {
         //Creates NPC State
-        defaultMoneyText = moneyText.text;
+        planner = GetComponent<GOAPPlanner>();
+        npcUI = GameObject.Find("NPC UI");
+        currentPlan = "No plan";
         foreach(Condition c in Enum.GetValues(typeof(Condition))){
             switch (c)
             {
@@ -32,6 +59,9 @@ public class NPC : MonoBehaviour
                     npcState.Add(c, float.MaxValue);
                     break;
                 case Condition.nearShop:
+                    npcState.Add(c, float.MaxValue);
+                    break;
+                case Condition.nearWood:
                     npcState.Add(c, float.MaxValue);
                     break;
                 default:
@@ -60,25 +90,15 @@ public class NPC : MonoBehaviour
         return npcState;
     }
 
-    public void INeedSword()
+    protected IEnumerator DoPlan(Queue<GOAPAction> plan, string goal)
     {
-        Debug.Log("I need a sword!");
-        Dictionary<Condition, object> gd = new Dictionary<Condition, object>();
-        gd.Add(Condition.hasSword, true);
-        Queue<GOAPAction> plan = planner.CreatePlan(this, gd);
-        if(plan != null)
+        currentPlan = "Current plan" + goal;
+        UI_Plan_Text.text = currentPlan;
+        while (plan.Count > 0)
         {
-            StartCoroutine(DoPlan(plan));
+            yield return plan.Dequeue().DoAction(npcState);
         }
-    }
-
-    private IEnumerator DoPlan(Queue<GOAPAction> plan)
-    {
-        Debug.Log("Time to do this thing!");
-        while(plan.Count > 0)
-        {
-            yield return plan.Dequeue().DoAction();
-        }
+        currentPlan = "No plan";
     }
 
     public void FindInteractablesInMoveRadius()
@@ -103,7 +123,7 @@ public class NPC : MonoBehaviour
                 GetComponents<PredictMove>()[i].CreatePostConditions(npcState);
             }
         }
-        //Destroy(reachedRadius);
+        Destroy(reachedRadius);
     }
 
     public void AddGOAPAction(GOAPAction a)
@@ -115,5 +135,47 @@ public class NPC : MonoBehaviour
     {
         money = m;
         moneyText.text = defaultMoneyText + money;
+    }
+
+    private void OnMouseEnter()
+    {
+        Tooltip.DisplayTooltip(this.name);
+    }
+
+    private void OnMouseExit()
+    {
+        Tooltip.HideTooltip();
+    }
+
+
+    public virtual void SetUI()
+    {
+
+    }
+
+    protected void SetButton(Button g, Goal goal)
+    {
+        if(g != null && goal != null)
+        {
+            g.gameObject.SetActive(true);
+            g.GetComponentInChildren<Text>().text = goal.goalName;
+        }
+    }
+
+    public virtual void ClearUI()
+    {
+        if(goal1Button != null)
+        {
+            goal1Button.gameObject.SetActive(false);
+            goal1Button.GetComponent<Button>().onClick.RemoveAllListeners();
+        }
+
+        if(goal2Button != null)
+        {
+            goal2Button.gameObject.SetActive(false);
+            goal2Button.GetComponent<Button>().onClick.RemoveAllListeners();
+        }
+        UI_Plan_Text.text = "";
+        moneyText.text = "";    
     }
 }

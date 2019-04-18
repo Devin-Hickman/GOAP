@@ -2,19 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GOAPPlanner
+public class GOAPPlanner : MonoBehaviour
 {
     int MAX_DEPTH = 5;
     HashSet<GOAPAction> usedActions = new HashSet<GOAPAction>();
 
     public Queue<GOAPAction> CreatePlan(NPC agent, Dictionary<Condition, object> goal)
     {
-        Debug.Log("Planning....");
         Dictionary<Condition, object> currentNPCState = agent.GetNPCState();
         //Check to see if goal is already fulfilled
         if (GoalFromState(goal, currentNPCState))
         {
-            Debug.Log("Hey this plan is finished already!");
             return null;
         }
 
@@ -25,8 +23,10 @@ public class GOAPPlanner
         List<GOAPNode> nodes = new List<GOAPNode>();
         BuildGraph(root, agent.AllActions, goal,0,solutionNodes);
 
-        Debug.Log("There's are " + solutionNodes.Count + " ways to do this!");
-        if (solutionNodes.Count == 0) return null;
+        if (solutionNodes.Count == 0)
+        {
+            return null;
+        }
 
         //Found at least one solution
         float minCost = solutionNodes[0].costSoFar;

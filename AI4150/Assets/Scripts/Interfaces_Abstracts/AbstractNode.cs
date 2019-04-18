@@ -11,7 +11,8 @@ public abstract class AbstractNode : INode
     public float GetY { get { return Pos.y; } }
     protected List<INode> neighbors;
     public float CostSoFar { get; set; }
-    public INode Parent { get; set; }
+    public AbstractNode Parent { get; set; }
+    public ParentRegionNode ParentRegion { get; set; }
     public List<INode> GetNeighbors()
     {
         return neighbors;

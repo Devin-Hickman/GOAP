@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Region A
   - Grid
+  - button
   layers:
   - Default
   - TransparentFX
@@ -19,8 +20,8 @@ TagManager:
   - UnWalkable
   - Items
   - NPC
-  - 
-  - 
+  - Group1
+  - Group2
   - 
   - 
   - 

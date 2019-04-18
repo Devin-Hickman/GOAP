@@ -9,4 +9,14 @@ public class Shop : GOAPInteractable
     {
         c = Condition.nearShop;
     }
+
+    private void OnMouseEnter()
+    {
+        Tooltip.DisplayTooltip("Shopkeeper");
+    }
+
+    private void OnMouseExit()
+    {
+        Tooltip.HideTooltip();
+    }
 }

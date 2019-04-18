@@ -14,8 +14,9 @@ public class PredictMove : GOAPAction
         base.Awake();
     }
 
-    public override IEnumerator DoAction()
+    public override IEnumerator DoAction(Dictionary<Condition, object> npcState)
     {
+        base.DoAction(npcState);
         yield return GetComponent<PathMaker>().MoveTowards(predictedPosition);
     }
 
@@ -44,6 +45,7 @@ public class PredictMove : GOAPAction
     public void CreatePostConditions(Dictionary<Condition, object> state)
     {
         GameObject npcPredictor = new GameObject();
+        npcPredictor.name = "NPCPREDICTOR";
         npcPredictor.transform.position = predictedPosition;
 
         ContactFilter2D cf2d = new ContactFilter2D();
@@ -67,6 +69,6 @@ public class PredictMove : GOAPAction
                 postConditions = interactableColliders[i].GetComponent<GOAPInteractable>().ApplyPostConditions(new Dictionary<Condition, object>(), dist);
             }
         }
-        //Destroy(npcPredictor);
+           Destroy(npcPredictor);
     }
 }

@@ -17,10 +17,10 @@ public class PathVisualizer : MonoBehaviour
         lineRenderer.endWidth = .25f;
     }
 
-    public void DrawLines(List<PathFindingNode> nodes)
+    public void DrawLines(List<AbstractNode> nodes)
     {
         positions = new List<Vector3>();
-        foreach(PathFindingNode node in nodes)
+        foreach(AbstractNode node in nodes)
         {
             positions.Add(new Vector3(node.GetX, node.GetY, 1));
         }

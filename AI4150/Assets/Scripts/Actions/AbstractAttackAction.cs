@@ -12,8 +12,9 @@ public abstract class AbstractAttackAction : GOAPAction
         preConditions.Add(Condition.hasTarget, true);
     }
 
-    public override IEnumerator DoAction()
+    public override IEnumerator DoAction(Dictionary<Condition, object> npcState)
     {
+        base.DoAction(npcState);
         target.UnderAttack(damage);
         yield return null;
     }

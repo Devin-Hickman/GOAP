@@ -6,9 +6,10 @@ using System.Linq;
 
 public class PathfindingGraph : MonoBehaviour, IGraph
 {
-    public List<PathFindingNode> PathSoFar { get; set; }
+    public List<AbstractNode> PathSoFar { get; set; }
     private Dictionary<string, PathFindingNode> bottomLevelDict = new Dictionary<string, PathFindingNode>();
-
+    private Dictionary<string, ParentRegionNode> midLevelDict = new Dictionary<string, ParentRegionNode>();
+    private Dictionary<string, ParentRegionNode> topLevelDict = new Dictionary<string, ParentRegionNode>();
     //List<PathFindingNode> topLevelPath = new List<PathFindingNode>();
     //List<PathFindingNode> midLevelPath = new List<PathFindingNode>();
 
@@ -27,7 +28,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     {
         hierarchicalGrids = new PathFindingNode[tileMapRegions.Count][,];
         pathVisaulDebugger = GetComponent<PathVisualizer>();
-        PathSoFar = new List<PathFindingNode>();
+        PathSoFar = new List<AbstractNode>();
     }
 
     void Start()
@@ -71,20 +72,9 @@ public class PathfindingGraph : MonoBehaviour, IGraph
      * Builds the varying layers of the graph and updates the heirarchicalGrids object accordingly
      * 
      */
-    public List<INode> BuildGraph()
+    public void BuildGraph()
     {
-        List<INode> res = new List<INode>();
-        BuildPathfindingNodes(0);
-        // to build next level of nodes do clustering on the first level of nodes based off of their distance from an estimated center
-        // instantiate clusters estimates with 5 times less nodes than the previous level
-        // do the same thing again on that layer to generate the top level.
-        //int layer = 1;
-        //while(hierarchicalGrids[layer - 1].Length * hierarchicalGrids[layer - 1].Length > 100)
-        //{
-
-        //}
-        //BuildPathfindingNodes(1);
-        return res;
+        BuildPathfindingNodes();
     }
 
     /*
@@ -96,12 +86,12 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     /**
      * Builds the lowest level of the graph using the tiles and updates the hierarchicalGrids object with that lowest level
      */
-    private void BuildPathfindingNodes(int currentLevel)
+    private void BuildPathfindingNodes()
     {
         int xIndex = -1;
         int yIndex = -1;
 
-        hierarchicalGrids[currentLevel] = CreateLowLevelGrid();
+        hierarchicalGrids[0] = CreateLowLevelGrid();
         int nodesMade = 0;
 
         for (float x = gridStartPos.position.x; x < gridEndPos.position.x; x += gridCellSize)
@@ -111,23 +101,26 @@ public class PathfindingGraph : MonoBehaviour, IGraph
             for (float y = gridStartPos.position.y; y < gridEndPos.position.y; y += gridCellSize)
             {
                 PathFindingNode tmp = null;
-                TileBase tileBase = tileMapRegions[currentLevel].GetTile(new Vector3Int((int)x, (int)y, 0));
+                TileBase tileBase = tileMapRegions[0].GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
+                TileBase parent1TileBase = tileMapRegions[1].GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
+                TileBase parent2TileBase = tileMapRegions[2].GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
+
                 if (tileBase != null) // Tile exists
                 {
                     nodesMade++;
-                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int((int)x, (int)y, 0));
+                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
                     bool walkable = (obstacleBase == null) ? true : false;
                     tmp = new PathFindingNode(new Vector2(x, y), walkable);
-                    CreateDebugNode(x, y, walkable, "L" + currentLevel + " N" +nodesMade);
+                    CreateDebugNode(x, y, walkable, "L" + 0 + " N" +nodesMade, .15f);
                 }
                 else
                 {
-                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int((int)x, (int)y, 0));
+                    TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
                     if(obstacleBase != null)
                     {
                         nodesMade++;
                         tmp = new PathFindingNode(new Vector2(x, y), false);
-                        CreateDebugNode(x, y, false, "L" + currentLevel + " N" + nodesMade);
+                        CreateDebugNode(x, y, false, "L" + 0 + " N" + nodesMade, .15f);
                     }
                 }
                 yIndex++;
@@ -135,24 +128,74 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                 {
                     bottomLevelDict.Add(tmp.GetName, tmp);
                 }
-                hierarchicalGrids[currentLevel][xIndex, yIndex] = tmp;
+                if (tmp != null && parent1TileBase != null && parent2TileBase != null)
+                {
+                    string parent1Sprite = ((Tile)parent1TileBase).sprite.name;
+                    if (!midLevelDict.ContainsKey(parent1Sprite))
+                    {
+                        midLevelDict[parent1Sprite] = new ParentRegionNode(parent1Sprite);
+                    }
+                    midLevelDict[parent1Sprite].AddToChildNodes(tmp);
+                    tmp.ParentRegion = midLevelDict[parent1Sprite];
+
+                    string parent2Sprite = ((Tile)parent2TileBase).sprite.name;
+                    if (!topLevelDict.ContainsKey(parent2Sprite))
+                    {
+                        topLevelDict[parent2Sprite] = new ParentRegionNode(parent2Sprite);
+                    }
+                    topLevelDict[parent2Sprite].AddToChildNodes(midLevelDict[parent1Sprite]);
+                    midLevelDict[parent1Sprite].ParentRegion = topLevelDict[parent2Sprite];
+                }
+                hierarchicalGrids[0][xIndex, yIndex] = tmp;
             }
         }
+        // right now the mid and top level nodes don't have x and y values. Have them make their own based on
+        // child nodes
+        foreach (KeyValuePair<string, ParentRegionNode> entry in midLevelDict)
+        {
+            entry.Value.CalculatePos();
+            //CreateDebugNode(entry.Value.GetX, entry.Value.GetY, true, "MidNode" + entry.Key, .75f);
+        }
+        foreach (KeyValuePair<string, ParentRegionNode> entry in topLevelDict)
+        {
+            entry.Value.CalculatePos();
+            CreateDebugNode(entry.Value.GetX, entry.Value.GetY, true, "TopNode" + entry.Key, .75f);
+        }
         AssignNodeNeighbors();
+    }
+
+    private void UpdateMidAndTopLevel(int x, int y, PathFindingNode curNode, PathFindingNode[,] grid, string currentParent, string currentParentsParent)
+    {
+        if (currentParent != null && grid[x, y].ParentRegion != null)
+        {
+            string otherSprite = grid[x, y].ParentRegion.TileSprite;
+            if (!currentParent.Equals(otherSprite))
+            {
+                curNode.ParentRegion.AddToBorderNodes(grid[x, y], otherSprite, grid[x, y].ParentRegion);
+            }
+
+            if (currentParentsParent != null && grid[x, y].ParentRegion.ParentRegion != null)
+            {
+                string otherSprite2 = grid[x, y].ParentRegion.ParentRegion.TileSprite;
+                if (!currentParentsParent.Equals(otherSprite2))
+                {
+                    curNode.ParentRegion.ParentRegion.AddToBorderNodes(grid[x, y].ParentRegion, otherSprite2, grid[x, y].ParentRegion.ParentRegion);
+                }
+            }
+        }
     }
 
     /**
     * Creates the nodes that are visible to the developer
     * 
     */
-    private void CreateDebugNode(float x, float y, bool walkable, string name)
+    private void CreateDebugNode(float x, float y, bool walkable, string name, float size)
     {
         GameObject g = new GameObject();
         g.transform.parent = GameObject.Find("DebugNodes").transform;
         g.AddComponent<NodeGizmos>();
-        g.GetComponent<NodeGizmos>().SetValues(x, y, walkable, name);
+        g.GetComponent<NodeGizmos>().SetValues(x, y, walkable, name, size);
     }
-
     /**
     * Adds the neighboring nodes as neighbors to each node if they are walkable.
     * 
@@ -170,18 +213,39 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                         if (grid[x, y] != null)
                         {
                             PathFindingNode curNode = grid[x, y];
+                            string currentParent = null;
+                            string currentParentsParent = null;
+                            if (curNode.ParentRegion != null) {
+                                currentParent = curNode.ParentRegion.TileSprite;
+                                if(curNode.ParentRegion.ParentRegion != null)
+                                {
+                                    currentParentsParent = curNode.ParentRegion.ParentRegion.TileSprite;
+                                }
+                            }
 
                             int xTmp = x - 1;
-                            if (xTmp > 0 && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) { curNode.AddNeighbor(grid[xTmp, y]); }
+                            if (xTmp > 0 && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) {
+                                curNode.AddNeighbor(grid[xTmp, y]);
+                                UpdateMidAndTopLevel(xTmp, y, curNode, grid, currentParent, currentParentsParent);
+                            }
 
                             xTmp = x + 1;
-                            if (xTmp < grid.GetLength(0) && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) { curNode.AddNeighbor(grid[xTmp, y]); }
+                            if (xTmp < grid.GetLength(0) && grid[xTmp, y] != null && grid[xTmp, y].IsWalkable) {
+                                curNode.AddNeighbor(grid[xTmp, y]);
+                                UpdateMidAndTopLevel(xTmp, y, curNode, grid, currentParent, currentParentsParent);
+                            }
 
                             int yTmp = y - 1;
-                            if (yTmp > 0 && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) { curNode.AddNeighbor(grid[x, yTmp]); }
+                            if (yTmp > 0 && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) {
+                                curNode.AddNeighbor(grid[x, yTmp]);
+                                UpdateMidAndTopLevel(x, yTmp, curNode, grid, currentParent, currentParentsParent);
+                            }
 
                             yTmp = y + 1;
-                            if (yTmp < grid.GetLength(1) && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) { curNode.AddNeighbor(grid[x, yTmp]); }
+                            if (yTmp < grid.GetLength(1) && grid[x, yTmp] != null && grid[x, yTmp].IsWalkable) {
+                                curNode.AddNeighbor(grid[x, yTmp]);
+                                UpdateMidAndTopLevel(x, yTmp, curNode, grid, currentParent, currentParentsParent);
+                            }
 
                         }
                     }
@@ -242,13 +306,13 @@ public class PathfindingGraph : MonoBehaviour, IGraph
 
     // do A star 
     // kick out if the parent changes or if you reach end
-    private PathFindingNode AStar(PathFindingNode start, PathFindingNode end)
+    private AbstractNode AStar(AbstractNode start, AbstractNode end)
     {
-        List<PathFindingNode> path = new List<PathFindingNode>();
+        List<AbstractNode> path = new List<AbstractNode>();
         // do A* from start to end but kick out the path if you enter a new region or sub region
         start.CostSoFar = 0;
         PriorityQueue priorityQueue = new PriorityQueue(start);
-        Dictionary<string, PathFindingNode> lookUpTable = new Dictionary<string, PathFindingNode>
+        Dictionary<string, AbstractNode> lookUpTable = new Dictionary<string, AbstractNode>
         {
             { start.GetName, start }
         };
@@ -256,9 +320,9 @@ public class PathfindingGraph : MonoBehaviour, IGraph
 
         while(priorityQueue.Count() > 0)
         {
-            PathFindingNode parent = (PathFindingNode)priorityQueue.Peek();
+            AbstractNode parent = (AbstractNode)priorityQueue.Peek();
             priorityQueue.Dequeue();
-            foreach(PathFindingNode neighbor in parent.GetNeighbors())
+            foreach(AbstractNode neighbor in parent.GetNeighbors())
             {
                 float costFromParent = (float)Math.Sqrt(Math.Pow(neighbor.GetX - parent.GetX, 2) + Math.Pow(neighbor.GetY - parent.GetY, 2));
                 float costSoFar = parent.CostSoFar + costFromParent;
@@ -280,6 +344,13 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                     neighbor.CostSoFar = costSoFar;
                     lookUpTable.Add(neighbor.GetName, neighbor);
                     priorityQueue.Enqueue(neighbor);
+                } else
+                {
+                    lookUpTable[neighbor.GetName].CostSoFar = costSoFar;
+                    if(!priorityQueue.IsConsistent())
+                    {
+
+                    }
                 }
             }
         }
@@ -292,43 +363,132 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     * Search
     * This is a generic search function for the algorithm
     * The start and end nodes must be in the same hierarchy and this will find it's way
+    * 
+    * PSEUDOCODE:
+    * Check if parent regions are the same and are not neighbors
+    * if not check if those parents have the same parents
+    * if top level parents not the same and are not neighbors:
+    * A* start.parentRegion.parentRegion, end.parentRegion.parentRegion
+    * Collect the path
+    * if the top level parents are the same or neighbors just start here
+    * get closest border node of next region in top level heirarchy
+    * Do A* in mid level heirarchy from start.ParentRegion to found border node
+    * Collect the path
+    * Get the closest node of the next region in mid level heirarchy
+    * if mid level parents are the same or neighbors just start here.
+    * Do A* in bottom level heirarchy from start to found border node
+    * append the path
+    * Loop on all of the above until we make it or we find the end point is unreachable.
+    * 
     */
-    public void Search(INode start, INode end)
+    public void Search(AbstractNode start, AbstractNode end)
     {
-        if(start == null || end == null || !((PathFindingNode)start).IsWalkable || !((PathFindingNode)end).IsWalkable)
+        if (start == null || end == null || !((PathFindingNode)start).IsWalkable || !((PathFindingNode)end).IsWalkable || start.GetName.Equals(end.GetName)){ return; }
+        PathSoFar = new List<AbstractNode>();
+        // midPathSoFar and TopPathSoFar are defined as an abstract node for flexibility but should only contain ParentRegionNodes
+        List<AbstractNode> MidPathSoFar = new List<AbstractNode>();
+        List<AbstractNode> TopPathSoFar = new List<AbstractNode>();
+        AbstractNode tmpMidStart = start.ParentRegion;
+        try
         {
-            // invalid node sent
-            return;
-        }
-        PathSoFar = new List<PathFindingNode>(); ;
-        PathFindingNode result = AStar((PathFindingNode)start, (PathFindingNode)end);
-        if(result == null)
-        {
-            // No path was found.
-            return;
-        }
-        int count = 0;
-        while(result.Parent != null)
-        {
-            if(result.CostSoFar == 0)
+            if (start.ParentRegion != null && end.ParentRegion != null && !start.ParentRegion.Equals(end.ParentRegion))
             {
-                break;
-            }
-            PathSoFar.Insert(0, result);
-            result = (PathFindingNode)result.Parent;
-            count++;
-        }
-        pathVisaulDebugger.DrawLines(PathSoFar);
-        return;
-    }
+                if (start.ParentRegion.ParentRegion != null && end.ParentRegion.ParentRegion != null && !start.ParentRegion.ParentRegion.Equals(end.ParentRegion.ParentRegion))
+                {
+                    TopPathSoFar.AddRange(GetNextSectionOfPath(start.ParentRegion.ParentRegion, end.ParentRegion.ParentRegion));
+                }
+                int i = 0;
+                while(i + 1 < TopPathSoFar.Count)
+                {
+                    AbstractNode closestNode = ((ParentRegionNode)TopPathSoFar[i]).GetClosestBorderNode(tmpMidStart.Pos, ((ParentRegionNode)TopPathSoFar[i + 1]).TileSprite);
+                    MidPathSoFar.AddRange(GetNextSectionOfPath(tmpMidStart, closestNode));
+                    tmpMidStart = closestNode;
+                    i++;
+                }
 
-    //public void Search(INode start, INode end, FindNextNode heuristic)
-    //{
-    //    throw new System.NotImplementedException();
-    //}
+                // START MID REGION CODE
+                // If the parent regions are neighbors then we can just do A* start to end without worrying about heirarchies
+                //if (!ParentsAreNeighbors(start, end))
+                //{
+                    // do A* in the mid level heirarchy
+                    MidPathSoFar.AddRange(GetNextSectionOfPath(tmpMidStart, end.ParentRegion));
+                    //pathVisaulDebugger.DrawLines(MidPathSoFar);
+                //}
+            }
+            AbstractNode tmpStart = start;
+            int j = 0;
+            while (j + 1 < MidPathSoFar.Count)
+            // While the next element in midLevel path isn't the last 
+            // get the closest border node of the next parent region then do A* to that border node
+            {
+                AbstractNode closestNode = ((ParentRegionNode)MidPathSoFar[j]).GetClosestBorderNode(tmpStart.Pos, ((ParentRegionNode)MidPathSoFar[j + 1]).TileSprite);
+                PathSoFar.AddRange(GetNextSectionOfPath(tmpStart, closestNode));
+                tmpStart = closestNode;
+                j++;
+            }
+            // after the loop regardless of if it has executed 0 times or a hundred
+            // do A* from either the last border node it went to or the starting node to the end
+            PathSoFar.AddRange(GetNextSectionOfPath(tmpStart, end));
+            pathVisaulDebugger.DrawLines(PathSoFar);
+            return;
+        } catch(Exception e)
+        {
+            // If something goes wrong, like the path isn't found, then we want to exit and to stop attempting to 
+            // build paths
+            return;
+        }
+
+    }
 
     public List<INode> GetGraph()
     {
         throw new System.NotImplementedException();
     }
+
+    private bool ParentsAreNeighbors(AbstractNode start, AbstractNode end)
+    {
+        List<INode> neighbors = start.ParentRegion.GetNeighbors();
+        bool found = false;
+        for (int i = 0; i < neighbors.Count; i++)
+        {
+            if (neighbors[i].Equals(end.ParentRegion))
+            {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
+    private List<AbstractNode> GetNextSectionOfPath(AbstractNode start, AbstractNode end)
+    {
+        AbstractNode tmpResult = AStar(start, end);
+        if (tmpResult == null)
+        {
+            // no path found stop path finding
+            throw new Exception("Path Not Found Exception");
+        }
+        return GeneratePathFromParents(tmpResult);
+
+    }
+
+    private List<AbstractNode> GeneratePathFromParents(AbstractNode result)
+    {
+        List<AbstractNode> path = new List<AbstractNode>();
+        int count = 0;
+        while (result.Parent != null)
+        {
+            if (result.CostSoFar == 0)
+            {
+                // the result node has a cost of zero we made it back
+                break;
+            }
+            path.Insert(0, result);
+            result = (AbstractNode)result.Parent;
+            count++;
+        }
+        return path;
+    }
+
 }
+

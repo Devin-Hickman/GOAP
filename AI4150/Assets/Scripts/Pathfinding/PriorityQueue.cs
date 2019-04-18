@@ -30,7 +30,9 @@ public class PriorityQueue
                 break; // child item is larger than (or equal) parent so we're done
             }
 
-            AbstractNode tmp = data[ci]; data[ci] = data[pi]; data[pi] = tmp;
+            AbstractNode tmp = data[ci];
+            data[ci] = data[pi];
+            data[pi] = tmp;
             ci = pi;
         }
     }

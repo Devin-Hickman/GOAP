@@ -13,6 +13,9 @@ public enum Condition
     hasIron,
     nearIron,
     canAfford,
-    nearShop
+    nearShop,
+    hasWood,
+    hasAxe,
+    nearWood
 }
 
