@@ -111,7 +111,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                     TileBase obstacleBase = obstacleMap.GetTile(new Vector3Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y), 0));
                     bool walkable = (obstacleBase == null) ? true : false;
                     tmp = new PathFindingNode(new Vector2(x, y), walkable);
-                    CreateDebugNode(x, y, walkable, "L" + 0 + " N" +nodesMade);
+                    CreateDebugNode(x, y, walkable, "L" + 0 + " N" +nodesMade, .15f);
                 }
                 else
                 {
@@ -120,7 +120,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                     {
                         nodesMade++;
                         tmp = new PathFindingNode(new Vector2(x, y), false);
-                        CreateDebugNode(x, y, false, "L" + 0 + " N" + nodesMade);
+                        CreateDebugNode(x, y, false, "L" + 0 + " N" + nodesMade, .15f);
                     }
                 }
                 yIndex++;
@@ -154,10 +154,12 @@ public class PathfindingGraph : MonoBehaviour, IGraph
         foreach (KeyValuePair<string, ParentRegionNode> entry in midLevelDict)
         {
             entry.Value.CalculatePos();
+            //CreateDebugNode(entry.Value.GetX, entry.Value.GetY, true, "MidNode" + entry.Key, .75f);
         }
         foreach (KeyValuePair<string, ParentRegionNode> entry in topLevelDict)
         {
             entry.Value.CalculatePos();
+            CreateDebugNode(entry.Value.GetX, entry.Value.GetY, true, "TopNode" + entry.Key, .75f);
         }
         AssignNodeNeighbors();
     }
@@ -187,14 +189,13 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     * Creates the nodes that are visible to the developer
     * 
     */
-    private void CreateDebugNode(float x, float y, bool walkable, string name)
+    private void CreateDebugNode(float x, float y, bool walkable, string name, float size)
     {
         GameObject g = new GameObject();
         g.transform.parent = GameObject.Find("DebugNodes").transform;
         g.AddComponent<NodeGizmos>();
-        g.GetComponent<NodeGizmos>().SetValues(x, y, walkable, name);
+        g.GetComponent<NodeGizmos>().SetValues(x, y, walkable, name, size);
     }
-
     /**
     * Adds the neighboring nodes as neighbors to each node if they are walkable.
     * 
@@ -346,6 +347,10 @@ public class PathfindingGraph : MonoBehaviour, IGraph
                 } else
                 {
                     lookUpTable[neighbor.GetName].CostSoFar = costSoFar;
+                    if(!priorityQueue.IsConsistent())
+                    {
+
+                    }
                 }
             }
         }
@@ -378,69 +383,93 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     */
     public void Search(AbstractNode start, AbstractNode end)
     {
-        if(start == null || end == null || !((PathFindingNode)start).IsWalkable || !((PathFindingNode)end).IsWalkable)
-        {
-            // invalid node sent
-            return;
-        }
+        if (start == null || end == null || !((PathFindingNode)start).IsWalkable || !((PathFindingNode)end).IsWalkable){ return; }
         PathSoFar = new List<AbstractNode>();
-        // midPathSoFar is defined as an abstract node for flexibility but should only contain ParentRegionNodes
+        // midPathSoFar and TopPathSoFar are defined as an abstract node for flexibility but should only contain ParentRegionNodes
         List<AbstractNode> MidPathSoFar = new List<AbstractNode>();
-        if(start.ParentRegion != null && end.ParentRegion != null && !start.ParentRegion.Equals(end.ParentRegion))
+        List<AbstractNode> TopPathSoFar = new List<AbstractNode>();
+        AbstractNode tmpMidStart = start.ParentRegion;
+        try
         {
-            // If the parent regions are neighbors then we can just do A* start to end without worrying about heirarchies
-            List<INode> neighbors = start.ParentRegion.GetNeighbors();
-            bool found = false;
-            for (int i = 0; i < neighbors.Count; i++)
+            if (start.ParentRegion != null && end.ParentRegion != null && !start.ParentRegion.Equals(end.ParentRegion))
             {
-                if(neighbors[i].Equals(end.ParentRegion))
+                if (start.ParentRegion.ParentRegion != null && end.ParentRegion.ParentRegion != null && !start.ParentRegion.ParentRegion.Equals(end.ParentRegion.ParentRegion))
                 {
-                    found = true;
-                    break;
+                    TopPathSoFar.AddRange(GetNextSectionOfPath(start.ParentRegion.ParentRegion, end.ParentRegion.ParentRegion));
                 }
+                int i = 0;
+                while(i + 1 < TopPathSoFar.Count)
+                {
+                    AbstractNode closestNode = ((ParentRegionNode)TopPathSoFar[i]).GetClosestBorderNode(tmpMidStart.Pos, ((ParentRegionNode)TopPathSoFar[i + 1]).TileSprite);
+                    MidPathSoFar.AddRange(GetNextSectionOfPath(tmpMidStart, closestNode));
+                    tmpMidStart = closestNode;
+                    i++;
+                }
+
+                // START MID REGION CODE
+                // If the parent regions are neighbors then we can just do A* start to end without worrying about heirarchies
+                //if (!ParentsAreNeighbors(start, end))
+                //{
+                    // do A* in the mid level heirarchy
+                    MidPathSoFar.AddRange(GetNextSectionOfPath(tmpMidStart, end.ParentRegion));
+                    //pathVisaulDebugger.DrawLines(MidPathSoFar);
+                //}
             }
-            if(!found)
+            AbstractNode tmpStart = start;
+            int j = 0;
+            while (j + 1 < MidPathSoFar.Count)
+            // While the next element in midLevel path isn't the last 
+            // get the closest border node of the next parent region then do A* to that border node
             {
-                // do A* in the mid level heirarchy
-                AbstractNode midResult = AStar(start.ParentRegion, end.ParentRegion);
-                MidPathSoFar.AddRange(GeneratePathFromParents(midResult));
-                pathVisaulDebugger.DrawLines(MidPathSoFar);
+                AbstractNode closestNode = ((ParentRegionNode)MidPathSoFar[j]).GetClosestBorderNode(tmpStart.Pos, ((ParentRegionNode)MidPathSoFar[j + 1]).TileSprite);
+                PathSoFar.AddRange(GetNextSectionOfPath(tmpStart, closestNode));
+                tmpStart = closestNode;
+                j++;
             }
-        }
-        AbstractNode tmpStart = start;
-        AbstractNode tmpEnd = end;
-        int j = 0;
-        while (j + 1 < MidPathSoFar.Count)
-        // While the next element in midLevel path isn't the last 
-        // get the closest border node of the next parent region then do A* to that border node
+            // after the loop regardless of if it has executed 0 times or a hundred
+            // do A* from either the last border node it went to or the starting node to the end
+            PathSoFar.AddRange(GetNextSectionOfPath(tmpStart, end));
+            pathVisaulDebugger.DrawLines(PathSoFar);
+            return;
+        } catch(Exception e)
         {
-            AbstractNode closestNode = ((ParentRegionNode)MidPathSoFar[j]).GetClosestBorderNode(tmpStart.Pos, ((ParentRegionNode)MidPathSoFar[j+1]).TileSprite);
-            AbstractNode tmpResult = AStar((PathFindingNode)tmpStart, (PathFindingNode)closestNode);
-            if (tmpResult == null)
-            {
-                // no path found stop path finding
-                return;
-            }
-            PathSoFar.AddRange(GeneratePathFromParents(tmpResult));
-            tmpStart = closestNode;
-            j++;
-        }
-        // after the loop regardless of if it has executed 0 times or a hundred
-        // do A* from either the last border node it went to or the starting node to the end
-        AbstractNode result = AStar((PathFindingNode)tmpStart, (PathFindingNode)end);
-        if (result == null)
-        {
-            // No path was found.
+            // If something goes wrong, like the path isn't found, then we want to exit and to stop attempting to 
+            // build paths
             return;
         }
-        PathSoFar.AddRange(GeneratePathFromParents(result));
-        pathVisaulDebugger.DrawLines(PathSoFar);
-        return;
+
     }
 
     public List<INode> GetGraph()
     {
         throw new System.NotImplementedException();
+    }
+
+    private bool ParentsAreNeighbors(AbstractNode start, AbstractNode end)
+    {
+        List<INode> neighbors = start.ParentRegion.GetNeighbors();
+        bool found = false;
+        for (int i = 0; i < neighbors.Count; i++)
+        {
+            if (neighbors[i].Equals(end.ParentRegion))
+            {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
+    private List<AbstractNode> GetNextSectionOfPath(AbstractNode start, AbstractNode end)
+    {
+        AbstractNode tmpResult = AStar(start, end);
+        if (tmpResult == null)
+        {
+            // no path found stop path finding
+            throw new Exception("Path Not Found Exception");
+        }
+        return GeneratePathFromParents(tmpResult);
+
     }
 
     private List<AbstractNode> GeneratePathFromParents(AbstractNode result)

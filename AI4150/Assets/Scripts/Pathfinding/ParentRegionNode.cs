@@ -79,6 +79,7 @@ public class ParentRegionNode : AbstractNode
             double temp = Math.Sqrt(Math.Pow(pos.x - node.GetX, 2) + Math.Pow(pos.y - node.GetY, 2));
             if(temp < shortestDist)
             {
+                shortestDist = temp;
                 bestNode = node;
             }
         }
@@ -87,6 +88,10 @@ public class ParentRegionNode : AbstractNode
 
     public override int Heuristic(AbstractNode toBeCompared, AbstractNode goalNode)
     {
+        if(ChildNodes.Contains(goalNode))
+        {
+            return -1;
+        }
         double thisDistance = Math.Sqrt(Math.Pow(this.GetX - goalNode.GetX, 2) + Math.Pow(this.GetY - goalNode.GetY, 2));
         double otherDistance = Math.Sqrt(Math.Pow(toBeCompared.GetX - goalNode.GetX, 2) + Math.Pow(toBeCompared.GetY - goalNode.GetY, 2));
         if (thisDistance < otherDistance) return -1;
