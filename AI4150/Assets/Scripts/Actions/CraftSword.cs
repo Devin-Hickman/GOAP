@@ -11,8 +11,9 @@ public class CraftSword : GOAPAction
         cost = 300f;
     }
 
-    public override IEnumerator DoAction()
+    public override IEnumerator DoAction(Dictionary<Condition, object> npcState)
     {
+        base.DoAction(npcState);
         yield return CreateSword();
     }
 

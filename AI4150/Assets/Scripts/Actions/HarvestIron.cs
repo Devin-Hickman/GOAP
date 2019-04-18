@@ -11,9 +11,9 @@ public class HarvestIron : GOAPAction
         cost = 50f;
     }
 
-    public override IEnumerator DoAction()
+    public override IEnumerator DoAction(Dictionary<Condition, object> npcState)
     {
-        Debug.Log("you got some iron!");
+        base.DoAction(npcState);
         yield return null;
     }
 

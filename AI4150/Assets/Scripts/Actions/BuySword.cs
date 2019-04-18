@@ -13,8 +13,9 @@ public class BuySword : GOAPAction
         cost = 10;
     }
 
-    public override IEnumerator DoAction()
+    public override IEnumerator DoAction(Dictionary<Condition, object> npcState)
     {
+        base.DoAction(npcState);
         Debug.Log("Bought a sword!");
         GameObject sword = Instantiate(Resources.Load("Sword")) as GameObject;
         sword.GetComponent<SpriteRenderer>().sortingOrder = 1;

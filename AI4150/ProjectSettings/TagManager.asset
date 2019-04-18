@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Region A
   - Grid
+  - button
   layers:
   - Default
   - TransparentFX
