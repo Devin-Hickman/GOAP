@@ -383,7 +383,7 @@ public class PathfindingGraph : MonoBehaviour, IGraph
     */
     public void Search(AbstractNode start, AbstractNode end)
     {
-        if (start == null || end == null || !((PathFindingNode)start).IsWalkable || !((PathFindingNode)end).IsWalkable){ return; }
+        if (start == null || end == null || !((PathFindingNode)start).IsWalkable || !((PathFindingNode)end).IsWalkable || start.GetName.Equals(end.GetName)){ return; }
         PathSoFar = new List<AbstractNode>();
         // midPathSoFar and TopPathSoFar are defined as an abstract node for flexibility but should only contain ParentRegionNodes
         List<AbstractNode> MidPathSoFar = new List<AbstractNode>();
