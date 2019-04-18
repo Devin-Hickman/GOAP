@@ -57,7 +57,11 @@ public abstract class GOAPAction : MonoBehaviour
         return newState;
     }
 
-    public abstract IEnumerator DoAction();
+    public virtual IEnumerator DoAction(Dictionary<Condition, object> npcState)
+    {
+        npcState = ApplyPostConditionsToState(npcState);
+        yield return null;
+    }
     protected abstract void AddPreConditions();
     protected abstract void AddPostConditions();
 }

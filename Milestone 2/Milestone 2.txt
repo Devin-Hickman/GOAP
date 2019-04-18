@@ -1,0 +1,32 @@
+﻿Douglas Schonholtz
+Devin Hickman
+
+
+Promised Deliverables:
+
+
+Two Distinct Goals with 8 actions that can be arranged in different ways for GOAP
+Finished Hierarchical Pathfinding.
+
+
+Current State:
+We have 5 goals with 4 different actions.
+We have non-hierarchical pathfinding done.
+
+
+As we worked on GOAP we realized that our attempt at a specific deliverable was misguided. As implemented, every condition for a GOAP action can be defined as completing some goal or precondition beforehand then string them together. In our implementation we have one solid goal demonstrated with two completely different paths to realize it, each path consisting of multiple actions with their own preconditions and effects.
+
+
+In our video demo we show our agent acquiring a sword to do battle with in two different ways. The first method is navigating to an iron mine, harvesting the iron, then crafting the sword. The other method is navigating to a shopkeeper and purchasing the sword with money. This can easily be expanded upon to include more interactables in the world, and have the crafting take place at a Blacksmith’s shop or something akin to that.
+
+
+For all intents and purposes the GOAP planner is finished and will construct dynamic plans. All further action required resolves around building a game to take full advantage of GOAP. There is still room for improvement in the GOAP system by switching to A* to plan the actions, and we hope to accomplish that with a generic A* algorithm alongside our hierarchical pathfinding.
+
+
+Instead of focusing on our siloed efforts of pathfinding and GOAP we put a significant amount of time into integrating the non-hierarchical pathfinding into the GOAP tasks such that our character could move around the screen and accomplish his goals without teleportation bringing us closer to a finished product.
+
+
+For hierarchical pathfinding, we will be able to use our tile system, the same way we do our obstacle mapping. By layering different types of tiles to define our hierarchies we should be able to quickly define parent regions for all nodes, allowing hierarchical pathfinding to not be too bad of an addition to the current system.
+
+
+So although we didn’t quite hit our goal of being done and just needing to do polish, we do think we have something closer to finished product then we anticipated and have now done a lot of the polish we were anticipating on doing in the final week.

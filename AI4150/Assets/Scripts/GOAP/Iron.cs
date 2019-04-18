@@ -8,4 +8,14 @@ public class Iron : GOAPInteractable
     {
         c = Condition.nearIron;
     }
+
+    private void OnMouseEnter()
+    {
+        Tooltip.DisplayTooltip("Iron");
+    }
+
+    private void OnMouseExit()
+    {
+        Tooltip.HideTooltip();
+    }
 }
