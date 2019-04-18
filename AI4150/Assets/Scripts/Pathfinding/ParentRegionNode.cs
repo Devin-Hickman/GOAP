@@ -79,6 +79,7 @@ public class ParentRegionNode : AbstractNode
             double temp = Math.Sqrt(Math.Pow(pos.x - node.GetX, 2) + Math.Pow(pos.y - node.GetY, 2));
             if(temp < shortestDist)
             {
+                shortestDist = temp;
                 bestNode = node;
             }
         }
